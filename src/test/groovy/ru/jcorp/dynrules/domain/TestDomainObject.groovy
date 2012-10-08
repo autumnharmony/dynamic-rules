@@ -36,13 +36,17 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     private Scanner reader
 
-    TestDomainObject(Reader reader) {
+    private PrintWriter printer
+
+    TestDomainObject(Reader reader, PrintWriter printer) {
         this.reader = new Scanner(reader)
+        this.printer = printer
     }
 
     Integer getX() {
         if (!_X_) {
-            println 'Please input X:'
+            if (printer)
+                printer.println 'Please input X:'
             _X_ = reader.nextInt()
         }
         return _X_
@@ -50,7 +54,8 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     Integer getT() {
         if (!_T_) {
-            println 'Please input T:'
+            if (printer)
+                printer.println 'Please input T:'
             _T_ = reader.nextInt()
         }
         return _T_

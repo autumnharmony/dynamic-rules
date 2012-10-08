@@ -58,10 +58,10 @@ class ModelTest extends TestCase {
     }
 
     void testDirectProductionalLogic() {
-        directProcessStream(new StringReader('3 25'))
+        directProcessStream(new StringReader('3 25'), null)
     }
 
-    void directProcessStream(Reader streamReader) {
+    void directProcessStream(Reader streamReader, PrintWriter printer) {
         GroovyShell sh = new GroovyShell()
         def scriptStream = getClass().getResourceAsStream('/rules/test-set.groovy')
         String script = scriptStream.withReader {
@@ -70,7 +70,7 @@ class ModelTest extends TestCase {
         }
         Closure ruleDefs = sh.evaluate(script) as Closure
 
-        DomainObject dObj = new TestDomainObject(streamReader)
+        DomainObject dObj = new TestDomainObject(streamReader, printer)
         RuleSet ruleSet = RuleSet.build(ruleDefs)
         directLogicProcess(ruleSet, dObj)
         assertEquals('AX', dObj.RESULT.get(0))
@@ -99,6 +99,9 @@ class ModelTest extends TestCase {
 
     public static void main(String[] args) {
         ModelTest m = new ModelTest()
-        m.directProcessStream(new InputStreamReader(System.in))
+        m.directProcessStream(
+                new InputStreamReader(System.in),
+                new PrintWriter(System.out)
+        )
     }
 }
