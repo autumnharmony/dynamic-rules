@@ -18,13 +18,87 @@
 package ru.jcorp.dynrules
 
 import junit.framework.TestCase
+import ru.jcorp.dynrules.util.DslSupport
+import ru.jcorp.dynrules.model.*
+import ru.jcorp.dynrules.production.DomainObject
+import ru.jcorp.dynrules.domain.TestDomainObject
 
 /**
  * @author artamonov
  */
 class ModelTest extends TestCase {
 
-    void test() {
+    void testRuleDsl() {
+        def rule = DslSupport.build(
+                {
+                    _if_ = [{ var -> true }, { false }]
+                    _then_ = {var -> 1}
+                    _reason_ = 'Reason'
+                },
+                new Rule('R0'))
+        assertNotNull(rule)
+        assertNotNull(rule.thenStatement)
+        assertEquals('Reason', rule.reason)
+        assertEquals(2, rule.ifStatements.size())
+    }
 
+    void testLoadRules() {
+        GroovyShell sh = new GroovyShell()
+        def scriptStream = getClass().getResourceAsStream('/rules/model-test-set.groovy')
+        String script = scriptStream.withReader {
+            reader ->
+            return '{it->\n' + reader.readLines().join('\n') + '\n}'
+        }
+        Closure ruleDefs = sh.evaluate(script) as Closure
+        assertNotNull(ruleDefs)
+
+        RuleSet ruleSet = RuleSet.build(ruleDefs)
+        assertNotNull(ruleSet)
+        assertEquals(2, ruleSet.size)
+    }
+
+    void testDirectProductionalLogic() {
+        directProcessStream(new StringReader('3 25'))
+    }
+
+    void directProcessStream(Reader streamReader) {
+        GroovyShell sh = new GroovyShell()
+        def scriptStream = getClass().getResourceAsStream('/rules/test-set.groovy')
+        String script = scriptStream.withReader {
+            reader ->
+            return '{it->\n' + reader.readLines().join('\n') + '\n}'
+        }
+        Closure ruleDefs = sh.evaluate(script) as Closure
+
+        DomainObject dObj = new TestDomainObject(streamReader)
+        RuleSet ruleSet = RuleSet.build(ruleDefs)
+        directLogicProcess(ruleSet, dObj)
+        assertEquals('AX', dObj.RESULT.get(0))
+    }
+
+    private directLogicProcess(RuleSet ruleSet, DomainObject dObj) {
+        for (Rule rule : ruleSet.rules) {
+            boolean conjValue = true;
+            def conjIter = rule.ifStatements.iterator()
+            while (conjValue && conjIter.hasNext()) {
+                Closure conj = conjIter.next()
+                conj.delegate = dObj
+                conj.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
+                def conjResult = conj.call()
+                conjValue &= conjResult
+            }
+            if (conjValue) {
+                Closure thenClosure = rule.thenStatement
+                thenClosure.delegate = dObj
+                thenClosure.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
+                thenClosure.call()
+                break;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        ModelTest m = new ModelTest()
+        m.directProcessStream(new InputStreamReader(System.in))
     }
 }
