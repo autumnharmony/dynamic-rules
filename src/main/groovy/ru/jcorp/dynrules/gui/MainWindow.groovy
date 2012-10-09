@@ -35,5 +35,45 @@ class MainWindow extends JFrame {
         this.defaultCloseOperation = EXIT_ON_CLOSE
         this.title = app.getMessage('application.title')
         this.iconImage = app.getResourceImage('application.png')
+
+        buildMenu()
     }
+
+    def buildMenu() {
+        def menuBar = app.guiBuilder.menuBar() {
+            menu(text: app.getMessage('menu.file')) {
+                menuItem(text: app.getMessage('menu.file.new'), //icon: app.getResourceIcon('menu/map.png'),
+                        actionPerformed: {
+                            newRules()
+                        })
+                menuItem(text: app.getMessage('menu.file.open'), //icon: app.getResourceIcon('menu/open.png'),
+                        actionPerformed: {
+                            selectRules()
+                        })
+                menuItem(text: app.getMessage('menu.file.save'), //icon: app.getResourceIcon('menu/save.png'),
+                        actionPerformed: {
+                            saveRules()
+                        })
+                separator()
+                menuItem(text: app.getMessage('menu.file.exit'), //icon: app.getResourceIcon('menu/exit.png'),
+                        actionPerformed: { System.exit(0) })
+            }
+            menu(text: app.getMessage('menu.help')) {
+                menuItem(text: app.getMessage('menu.help.about'), //icon: app.getResourceIcon('menu/about.png'),
+                        actionPerformed: {
+                            AboutWindow about = new AboutWindow()
+                            about.locationRelativeTo = this
+                            about.setVisible(true)
+                        })
+            }
+        }
+        setJMenuBar(menuBar)
+    }
+
+    def newRules(){}
+
+    def selectRules(){}
+
+    def saveRules(){}
+
 }
