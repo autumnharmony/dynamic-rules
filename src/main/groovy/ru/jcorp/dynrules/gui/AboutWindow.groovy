@@ -44,11 +44,8 @@ class AboutWindow extends JDialog {
         def panel = app.guiBuilder.panel(constraints: BorderLayout.CENTER) {
             borderLayout()
             vbox(constraints: PAGE_START, border: new EmptyBorder(3, 5, 3, 5)) {
-                label(text: app.getMessage('authors'),
-                        border: new EmptyBorder(3, 5, 3, 5))
-                label(text: app.getMessage('teacher'),
-                        border: new EmptyBorder(3, 5, 3, 5))
-                vglue()
+                label(text: app.getMessage('authors'), border: new EmptyBorder(3, 5, 3, 5))
+                label(text: app.getMessage('teacher'), border: new EmptyBorder(3, 5, 3, 5))
             }
             textArea(constraints: CENTER, text: readTask(), editable: false)
             hbox(constraints: PAGE_END, border: new EmptyBorder(3, 5, 3, 5)) {
@@ -61,13 +58,13 @@ class AboutWindow extends JDialog {
     }
 
     def readTask() {
-        InputStream problemStream = getClass().getResourceAsStream("/TASK")
-        BufferedReader reader = new BufferedReader(new InputStreamReader(problemStream, "UTF-8"))
+        InputStream problemStream = getClass().getResourceAsStream('/TASK')
+        BufferedReader reader = new BufferedReader(new InputStreamReader(problemStream, 'UTF-8'))
         StringBuilder builder = new StringBuilder()
 
         String line
         while ((line = reader.readLine()) != null)
-            builder.append(line).append("\n")
+            builder.append(line).append('\n')
 
         return builder.toString()
     }

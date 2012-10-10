@@ -17,26 +17,27 @@
 
 package ru.jcorp.dynrules
 
+import groovy.swing.SwingBuilder
+import ru.jcorp.dynrules.gui.MainWindow
+import ru.jcorp.dynrules.sys.Utf8ResourceBundle
+
+import java.awt.Image
+import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
-import ru.jcorp.dynrules.gui.MainWindow
-import groovy.swing.SwingBuilder
-import ru.jcorp.dynrules.sys.Utf8ResourceBundle
-import javax.swing.ImageIcon
-import java.awt.Image
 
 /**
  * @author artamonov
  */
 class DynamicRulesApp {
 
-    private MainWindow mainWindow;
+    private MainWindow mainWindow
 
-    private SwingBuilder guiBuilder;
+    private SwingBuilder guiBuilder
 
-    private ResourceBundle resourceBundle;
+    private ResourceBundle resourceBundle
 
-    private static DynamicRulesApp instance;
+    private static DynamicRulesApp instance
 
     DynamicRulesApp() {
         // load localization
@@ -48,21 +49,20 @@ class DynamicRulesApp {
 
     private void run() {
         SwingUtilities.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 try {
                     UIManager.setLookAndFeel('com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel')
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    return;
+                    e.printStackTrace()
+                    return
                 }
 
-                mainWindow = new MainWindow();
-                mainWindow.setLocationByPlatform(true);
-                mainWindow.setVisible(true);
+                mainWindow = new MainWindow()
+                mainWindow.locationByPlatform = true
+                mainWindow.visible = true
             }
-        });
+        })
     }
 
     public static void main(String[] args) {
