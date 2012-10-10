@@ -62,4 +62,31 @@ class Rule {
     String getName() {
         return name
     }
+
+    List<String> getVariables(Closure closure) {
+        DelegateStub ds = new DelegateStub()
+        closure.delegate = ds
+        closure.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
+        closure.call()
+        return ds.variables
+    }
+
+    List<String> getTargetVariables() {
+        return getVariables(this.thenStatement)
+    }
+
+    private static class DelegateStub extends GroovyObjectSupport {
+
+        private List<String> variables = new LinkedList<String>()
+
+        @Override
+        Object getProperty(String property) {
+            variables.add property
+            return null
+        }
+
+        List<String> getVariables() {
+            return variables
+        }
+    }
 }
