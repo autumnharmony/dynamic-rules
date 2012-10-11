@@ -168,27 +168,28 @@ class ModelTest extends TestCase {
     }
 
     private indirectLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
-        Boolean hasRules = true
+        boolean hasRules = true
         Set<String> badValues = new HashSet<String>()
 
         while (!variablesStack.isEmpty() && hasRules) {
-            Boolean newTargetVariable = false
+            boolean newTargetVariable = false
             List<Rule> withRule = new LinkedList<Rule>()
             hasRules = false
-            Boolean ruleFound
+            boolean ruleFound = false
 
             for (Rule r : ruleSet.rules) {
+                //add rules with current top stack variable to withRule set
                 if (r.getTargetVariables().contains(variablesStack.peek())) {
                     withRule.add(r)
                     hasRules = true
                 }
-            }//add rules with current top stack variable to withRule set
+            }
 
             if (hasRules) {
                 ruleFound = false
-                def rule
+                def rule = null
                 def itR = withRule.iterator()
-                while (itR.hasNext() && !ruleFound) {
+                while (!ruleFound && itR.hasNext()) {
                     rule = itR.next()
                     Boolean conjValue = true
                     boolean allValuesResolved = true
@@ -213,14 +214,14 @@ class ModelTest extends TestCase {
                         if (conjResult instanceof Boolean)
                             conjValue = conjResult
                         else if (conjResult != null)
-                            throw new RuleStatementException()
+                            throw new RuleStatementException(rule.name)
                     }
 
                     if (allValuesResolved) {
                         ruleFound = conjValue
                     }
                 }
-                if (!newTargetVariable && ruleFound) {
+                if (!newTargetVariable && ruleFound && rule != null) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
                     thenClosure.call()
                 }
@@ -229,7 +230,8 @@ class ModelTest extends TestCase {
                 if (!variablesStack.empty() && badValues.contains(variablesStack.peek())) {
                     variablesStack.removeAll(badValues)
                 }
-                badValues.add(variablesStack.pop())
+                if (!variablesStack.empty())
+                    badValues.add(variablesStack.pop())
             }
 
         }
