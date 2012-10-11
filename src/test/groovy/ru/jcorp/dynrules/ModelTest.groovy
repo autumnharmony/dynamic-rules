@@ -226,15 +226,14 @@ class ModelTest extends TestCase {
                 }
             }
             if (!newTargetVariable && !ruleFound) {
+                if (!variablesStack.empty() && badValues.contains(variablesStack.peek())) {
+                    variablesStack.removeAll(badValues)
+                }
                 badValues.add(variablesStack.pop())
             }
-            if (!variablesStack.empty() && badValues.contains(variablesStack.peek())) {
-                variablesStack.removeAll(badValues)
-            }
+
         }
-        if (dObj.resolved) {
-            //resolved
-        } else {
+        if (!dObj.resolved) {
             throw new UnresolvedRuleSystemException()
         }
     }
