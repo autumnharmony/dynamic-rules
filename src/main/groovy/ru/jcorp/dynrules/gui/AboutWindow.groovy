@@ -33,7 +33,7 @@ class AboutWindow extends JDialog {
     AboutWindow() {
         this.app = DynamicRulesApp.instance
 
-        this.size = [500, 350]
+        this.size = [600, 400]
         this.title = app.getMessage('menu.help.about')
         this.iconImage = app.getResourceImage('application.png')
 
@@ -47,7 +47,7 @@ class AboutWindow extends JDialog {
                 label(text: app.getMessage('authors'), border: new EmptyBorder(3, 5, 3, 5))
                 label(text: app.getMessage('teacher'), border: new EmptyBorder(3, 5, 3, 5))
             }
-            textArea(constraints: CENTER, text: readTask(), editable: false)
+            textArea(constraints: CENTER, text: readTask(), editable: false, lineWrap: true, wrapStyleWord: true)
             hbox(constraints: PAGE_END, border: new EmptyBorder(3, 5, 3, 5)) {
                 hglue()
                 button(text: app.getMessage('edit.ok'), actionPerformed: { this.dispose() })

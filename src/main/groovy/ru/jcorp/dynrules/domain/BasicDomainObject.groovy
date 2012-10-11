@@ -38,6 +38,12 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     final CraneType BK = CraneType.BK
     final CraneType PK = CraneType.PK
 
+    final ObjectType WORKSHOP = ObjectType.WORKSHOP
+    final ObjectType WAREHOUSE = ObjectType.WAREHOUSE
+    final ObjectType POWERSTATION = ObjectType.POWERSTATION
+    final ObjectType RIVERPORT = ObjectType.RIVERPORT
+    final ObjectType CONSTRUCTION = ObjectType.CONSTRUCTION
+
     private List<CraneType> _RESULT_ = null
 
     protected Map<String, Object> miscVariables = new HashMap<String, Object>()

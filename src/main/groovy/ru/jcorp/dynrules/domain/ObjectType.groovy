@@ -20,19 +20,17 @@ package ru.jcorp.dynrules.domain
 /**
  * @author artamonov
  */
-public enum CraneType {
+enum ObjectType {
 
-    MK('crane.MK'),
-    NKPK('crane.NKPK'),
-    KK('crane.KK'),
-    MP('crane.MP'),
-    SSK('crane.SSK'),
-    BK('crane.BK'),
-    PK('crane.PK')
+    WORKSHOP('object.WORKSHOP'),
+    WAREHOUSE('object.WAREHOUSE'),
+    POWERSTATION('object.POWERSTATION'),
+    RIVERPORT('object.RIVERPORT'),
+    CONSTRUCTION('object.CONSTRUCTION')
 
     final String id
 
-    CraneType(String id) {
+    ObjectType(String id) {
         this.id = id
     }
 }

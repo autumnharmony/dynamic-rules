@@ -42,24 +42,20 @@ class MainWindow extends JFrame {
     def buildMenu() {
         def menuBar = app.guiBuilder.menuBar() {
             menu(text: app.getMessage('menu.file')) {
-                menuItem(text: app.getMessage('menu.file.new'), //icon: app.getResourceIcon('menu/map.png'),
+                menuItem(text: app.getMessage('menu.file.new'), icon: app.getResourceIcon('menu/lightning.png'),
                         actionPerformed: {
                             newRules()
                         })
-                menuItem(text: app.getMessage('menu.file.open'), //icon: app.getResourceIcon('menu/open.png'),
+                menuItem(text: app.getMessage('menu.file.loadRules'), icon: app.getResourceIcon('menu/open.png'),
                         actionPerformed: {
                             selectRules()
                         })
-                menuItem(text: app.getMessage('menu.file.save'), //icon: app.getResourceIcon('menu/save.png'),
-                        actionPerformed: {
-                            saveRules()
-                        })
                 separator()
-                menuItem(text: app.getMessage('menu.file.exit'), //icon: app.getResourceIcon('menu/exit.png'),
+                menuItem(text: app.getMessage('menu.file.exit'), icon: app.getResourceIcon('menu/exit.png'),
                         actionPerformed: { System.exit(0) })
             }
             menu(text: app.getMessage('menu.help')) {
-                menuItem(text: app.getMessage('menu.help.about'), //icon: app.getResourceIcon('menu/about.png'),
+                menuItem(text: app.getMessage('menu.help.about'), icon: app.getResourceIcon('menu/about.png'),
                         actionPerformed: {
                             AboutWindow about = new AboutWindow()
                             about.locationRelativeTo = this
