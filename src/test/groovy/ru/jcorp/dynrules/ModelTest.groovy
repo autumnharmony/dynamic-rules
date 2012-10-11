@@ -18,6 +18,7 @@
 package ru.jcorp.dynrules
 
 import junit.framework.TestCase
+import ru.jcorp.dynrules.domain.InvertedTestDomainObject
 import ru.jcorp.dynrules.domain.TestDomainObject
 import ru.jcorp.dynrules.exceptions.CannotInputVariableException
 import ru.jcorp.dynrules.exceptions.RuleStatementException
@@ -65,10 +66,27 @@ class ModelTest extends TestCase {
         assertEquals('AX', dObj.RESULT.get(0))
     }
 
+    void testIndirectProductionLogic() {
+        def dObj = indirectProcessStream(new StringReader('3 25'), null)
+        assertEquals('AX', dObj.RESULT.get(0))
+        dObj = indirectProcessStream(new StringReader('2'), null)
+        assertEquals('AX', dObj.RESULT.get(0))
+    }
+
     void testDirectProductionalLogicFail() {
         boolean exception = false
         try {
             directProcessStream(new StringReader('5'), null)
+        } catch (UnresolvedRuleSystemException e) {
+            exception = true
+        }
+        assertTrue(exception)
+    }
+
+    void testIndirectProductionalLogicFail() {
+        boolean exception = false
+        try {
+            indirectProcessStream(new StringReader('5'), null)
         } catch (UnresolvedRuleSystemException e) {
             exception = true
         }
@@ -82,6 +100,16 @@ class ModelTest extends TestCase {
         TestDomainObject dObj = new TestDomainObject(streamReader, printer, variablesQueue)
         RuleSet ruleSet = RuleSet.build(ruleDefs)
         directLogicProcess(ruleSet, dObj, variablesQueue)
+        return dObj
+    }
+
+    TestDomainObject indirectProcessStream(Reader streamReader, PrintWriter printer) {
+        Closure ruleDefs = loadClosureFromResource('/rules/test-set.groovy')
+
+        Stack<String> variablesStack = new Stack<String>()
+        InvertedTestDomainObject dObj = new InvertedTestDomainObject(streamReader, printer, variablesStack)
+        RuleSet ruleSet = RuleSet.build(ruleDefs)
+        indirectLogicProcess(ruleSet, dObj, variablesStack)
         return dObj
     }
 
@@ -137,6 +165,71 @@ class ModelTest extends TestCase {
 
         if (!resolved)
             throw new UnresolvedRuleSystemException()
+    }
+
+    private indirectLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
+        Boolean hasRules = true
+
+        while (!variablesStack.isEmpty() && hasRules) {
+            Boolean newTargetVariable = false
+            RuleSet withRule = new RuleSet()
+            hasRules = false
+            for (Rule r : ruleSet.rules) {
+                if (r.getTargetVariables().contains(variablesStack.peek())) {
+                    withRule.rules.add(r)
+                    hasRules = true
+                }
+            }//add rules with current top stack variable to withRule set
+
+            if (hasRules) {
+                Boolean ruleFound = false
+                def rule
+                def itR = withRule.rules.iterator()
+                while (itR.hasNext() && !ruleFound) {
+                    rule = itR.next()
+                    Boolean conjValue = true
+                    boolean allValuesResolved = true
+
+                    if (rule.failed) {
+                        conjValue = false
+                    }
+
+                    def it = rule.ifStatements.iterator()
+                    while (conjValue && it.hasNext()) {
+                        Closure conj = linkClosureToDelegate(it.next(), dObj)
+
+                        def conjResult
+                        try {
+                            conjResult = conj.call()
+                        } catch (CannotInputVariableException e) {
+                            variablesStack.add(e.variable)
+                            allValuesResolved = false
+                            newTargetVariable = true
+                            break
+                        }
+
+                        if (conjResult instanceof Boolean)
+                            conjValue = conjResult
+                        else if (conjResult != null)
+                            throw new RuleStatementException()
+                    }
+
+                    if (allValuesResolved) {
+                        ruleFound = conjValue
+                    }
+                }
+                if (!newTargetVariable && ruleFound) {
+                    Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
+                    thenClosure.call()
+                }
+
+            }
+        }
+        if (dObj.resolved) {
+            //resolved
+        } else {
+            throw new UnresolvedRuleSystemException()
+        }
     }
 
     public static void main(String[] args) {

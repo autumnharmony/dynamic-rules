@@ -87,7 +87,7 @@ class Rule {
 
     private static class DelegateStub extends GroovyObjectSupport {
 
-        private List<String> variables = new LinkedList<String>()
+        private Set<String> variables = new LinkedHashSet<String>()
 
         @Override
         Object getProperty(String property) {
@@ -95,8 +95,13 @@ class Rule {
             return null
         }
 
+        @Override
+        void setProperty(String property, Object newValue) {
+            variables.add property
+        }
+
         List<String> getVariables() {
-            return variables
+            return new ArrayList(variables)
         }
     }
 }
