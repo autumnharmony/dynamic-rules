@@ -18,15 +18,17 @@
 package ru.jcorp.dynrules
 
 import junit.framework.TestCase
-import ru.jcorp.dynrules.util.DslSupport
-import ru.jcorp.dynrules.model.*
-import ru.jcorp.dynrules.production.DomainObject
 import ru.jcorp.dynrules.domain.TestDomainObject
 import ru.jcorp.dynrules.exceptions.CannotInputVariableException
-import ru.jcorp.dynrules.exceptions.UnresolvedRuleSystemException
 import ru.jcorp.dynrules.exceptions.RuleStatementException
+import ru.jcorp.dynrules.exceptions.UnresolvedRuleSystemException
+import ru.jcorp.dynrules.model.Rule
+import ru.jcorp.dynrules.model.RuleSet
+import ru.jcorp.dynrules.production.DomainObject
+import ru.jcorp.dynrules.util.DslSupport
 
 import static ru.jcorp.dynrules.util.DslSupport.linkClosureToDelegate
+import static ru.jcorp.dynrules.util.DslSupport.loadClosureFromResource
 
 /**
  * @author artamonov
@@ -48,13 +50,7 @@ class ModelTest extends TestCase {
     }
 
     void testLoadRules() {
-        GroovyShell sh = new GroovyShell()
-        def scriptStream = getClass().getResourceAsStream('/rules/model-test-set.groovy')
-        String script = scriptStream.withReader {
-            reader ->
-            return '{it->\n' + reader.readLines().join('\n') + '\n}'
-        }
-        Closure ruleDefs = sh.evaluate(script) as Closure
+        Closure ruleDefs = loadClosureFromResource('/rules/model-test-set.groovy')
         assertNotNull(ruleDefs)
 
         RuleSet ruleSet = RuleSet.build(ruleDefs)
@@ -63,8 +59,10 @@ class ModelTest extends TestCase {
     }
 
     void testDirectProductionLogic() {
-        directProcessStream(new StringReader('3 25'), null)
-        directProcessStream(new StringReader('2'), null)
+        def dObj = directProcessStream(new StringReader('3 25'), null)
+        assertEquals('AX', dObj.RESULT.get(0))
+        dObj = directProcessStream(new StringReader('2'), null)
+        assertEquals('AX', dObj.RESULT.get(0))
     }
 
     void testDirectProductionalLogicFail() {
@@ -77,20 +75,14 @@ class ModelTest extends TestCase {
         assertTrue(exception)
     }
 
-    void directProcessStream(Reader streamReader, PrintWriter printer) {
-        GroovyShell sh = new GroovyShell()
-        def scriptStream = getClass().getResourceAsStream('/rules/test-set.groovy')
-        String script = scriptStream.withReader {
-            reader ->
-            return '{it->\n' + reader.readLines().join('\n') + '\n}'
-        }
-        Closure ruleDefs = sh.evaluate(script) as Closure
+    TestDomainObject directProcessStream(Reader streamReader, PrintWriter printer) {
+        Closure ruleDefs = loadClosureFromResource('/rules/test-set.groovy')
 
         Set<String> variablesQueue = new HashSet<String>()
-        DomainObject dObj = new TestDomainObject(streamReader, printer, variablesQueue)
+        TestDomainObject dObj = new TestDomainObject(streamReader, printer, variablesQueue)
         RuleSet ruleSet = RuleSet.build(ruleDefs)
         directLogicProcess(ruleSet, dObj, variablesQueue)
-        assertEquals('AX', dObj.RESULT.get(0))
+        return dObj
     }
 
     private directLogicProcess(RuleSet ruleSet, DomainObject dObj, Set<String> variablesQueue) {
@@ -140,7 +132,7 @@ class ModelTest extends TestCase {
                     }
                 }
             }
-            runCount++;
+            runCount++
         }
 
         if (!resolved)

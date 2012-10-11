@@ -59,13 +59,10 @@ class AboutWindow extends JDialog {
 
     def readTask() {
         InputStream problemStream = getClass().getResourceAsStream('/TASK')
-        BufferedReader reader = new BufferedReader(new InputStreamReader(problemStream, 'UTF-8'))
-        StringBuilder builder = new StringBuilder()
-
-        String line
-        while ((line = reader.readLine()) != null)
-            builder.append(line).append('\n')
-
-        return builder.toString()
+        String taskText = problemStream.withReader {
+            reader ->
+            return reader.readLines().join('\n')
+        }
+        return taskText
     }
 }

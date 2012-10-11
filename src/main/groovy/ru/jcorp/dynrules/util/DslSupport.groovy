@@ -33,4 +33,17 @@ class DslSupport {
         closure.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
         return closure
     }
+
+    static Closure loadClosureFromResource(String resource) {
+        return loadClosureFromStream(DslSupport.class.getResourceAsStream(resource))
+    }
+
+    static Closure loadClosureFromStream(InputStream closureStream) {
+        GroovyShell sh = new GroovyShell()
+        String script = closureStream.withReader {
+            reader ->
+            return '{it->\n' + reader.readLines().join('\n') + '\n}'
+        }
+        return sh.evaluate(script) as Closure
+    }
 }

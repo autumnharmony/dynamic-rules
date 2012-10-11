@@ -52,8 +52,10 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     Integer getX() {
         if (!_X_) {
-            if (printer)
+            if (printer) {
                 printer.println 'Please input X:'
+                printer.flush()
+            }
             _X_ = reader.nextInt()
         }
         return _X_
@@ -74,8 +76,10 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     Integer getT() {
         if (!_T_) {
-            if (printer)
+            if (printer) {
                 printer.println 'Please input T:'
+                printer.flush()
+            }
             _T_ = reader.nextInt()
         }
         return _T_
@@ -88,6 +92,10 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
     void setRESULT(List<String> result) {
         variablesQueue.remove('RESULT')
         RESULT = result
+        if (printer) {
+            printer.println RESULT
+            printer.flush()
+        }
     }
 
     @Override
