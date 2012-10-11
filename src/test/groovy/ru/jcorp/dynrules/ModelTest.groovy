@@ -103,7 +103,7 @@ class ModelTest extends TestCase {
         return dObj
     }
 
-    TestDomainObject indirectProcessStream(Reader streamReader, PrintWriter printer) {
+    InvertedTestDomainObject indirectProcessStream(Reader streamReader, PrintWriter printer) {
         Closure ruleDefs = loadClosureFromResource('/rules/test-set.groovy')
 
         Stack<String> variablesStack = new Stack<String>()
@@ -169,22 +169,25 @@ class ModelTest extends TestCase {
 
     private indirectLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
         Boolean hasRules = true
+        Set<String> badValues = new HashSet<String>()
 
         while (!variablesStack.isEmpty() && hasRules) {
             Boolean newTargetVariable = false
-            RuleSet withRule = new RuleSet()
+            List<Rule> withRule = new LinkedList<Rule>()
             hasRules = false
+            Boolean ruleFound
+
             for (Rule r : ruleSet.rules) {
                 if (r.getTargetVariables().contains(variablesStack.peek())) {
-                    withRule.rules.add(r)
+                    withRule.add(r)
                     hasRules = true
                 }
             }//add rules with current top stack variable to withRule set
 
             if (hasRules) {
-                Boolean ruleFound = false
+                ruleFound = false
                 def rule
-                def itR = withRule.rules.iterator()
+                def itR = withRule.iterator()
                 while (itR.hasNext() && !ruleFound) {
                     rule = itR.next()
                     Boolean conjValue = true
@@ -202,9 +205,8 @@ class ModelTest extends TestCase {
                         try {
                             conjResult = conj.call()
                         } catch (CannotInputVariableException e) {
-                            variablesStack.add(e.variable)
                             allValuesResolved = false
-                            newTargetVariable = true
+                            newTargetVariable = !badValues.contains(e.variable)
                             break
                         }
 
@@ -222,7 +224,12 @@ class ModelTest extends TestCase {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
                     thenClosure.call()
                 }
-
+            }
+            if (!newTargetVariable && !ruleFound) {
+                badValues.add(variablesStack.pop())
+            }
+            if (!variablesStack.empty() && badValues.contains(variablesStack.peek())) {
+                variablesStack.removeAll(badValues)
             }
         }
         if (dObj.resolved) {

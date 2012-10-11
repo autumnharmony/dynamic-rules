@@ -69,7 +69,7 @@ class Rule {
 
     List<String> getVariables(Closure closure) {
         DelegateStub ds = new DelegateStub()
-        linkClosureToDelegate(closure, new DelegateStub())
+        linkClosureToDelegate(closure, ds)
         closure.call()
         return ds.getInspectedVariables()
     }
