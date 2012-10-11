@@ -41,9 +41,9 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     private PrintWriter printer
 
-    private Queue<String> variablesQueue
+    private Set<String> variablesQueue
 
-    TestDomainObject(Reader reader, PrintWriter printer, Queue<String> variablesQueue) {
+    TestDomainObject(Reader reader, PrintWriter printer, Set<String> variablesQueue) {
         this.reader = new Scanner(reader)
         this.printer = printer
         this.variablesQueue = variablesQueue

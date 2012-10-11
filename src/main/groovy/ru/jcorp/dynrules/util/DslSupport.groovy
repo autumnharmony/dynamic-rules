@@ -27,4 +27,10 @@ class DslSupport {
         closure.call()
         return delegate
     }
+
+    static Closure linkClosureToDelegate(Closure closure, Object delegate) {
+        closure.delegate = delegate
+        closure.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
+        return closure
+    }
 }
