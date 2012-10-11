@@ -20,11 +20,7 @@ package ru.jcorp.dynrules.domain
 import ru.jcorp.dynrules.production.DomainObject
 
 /**
- * Created with IntelliJ IDEA.
- * User: Comp
- * Date: 11.10.12
- * Time: 21:35
- * To change this template use File | Settings | File Templates.
+ * @author ulbekov
  */
 class InvertedDomainObject extends GroovyObjectSupport implements DomainObject {
     //исходные данных
@@ -97,5 +93,10 @@ class InvertedDomainObject extends GroovyObjectSupport implements DomainObject {
             return getRESULT()
 
         return super.getProperty(property)
+    }
+
+    @Override
+    boolean isResolved() {
+        return RESULT != null
     }
 }

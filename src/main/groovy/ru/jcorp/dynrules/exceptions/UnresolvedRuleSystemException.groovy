@@ -15,12 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.jcorp.dynrules.production
+package ru.jcorp.dynrules.exceptions
 
 /**
  * @author artamonov
  */
-interface DomainObject {
-
-    boolean isResolved();
+class UnresolvedRuleSystemException extends RuntimeException {
 }

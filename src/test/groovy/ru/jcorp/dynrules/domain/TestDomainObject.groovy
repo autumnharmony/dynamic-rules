@@ -18,6 +18,7 @@
 package ru.jcorp.dynrules.domain
 
 import ru.jcorp.dynrules.production.DomainObject
+import ru.jcorp.dynrules.exceptions.CannotInputVariableException
 
 /**
  * @author artamonov
@@ -27,6 +28,8 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
     private Integer _X_ = null
 
     private Integer _T_ = null
+
+    private Integer _C_ = null
 
     private List<String> RESULT = null
 
@@ -38,9 +41,13 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     private PrintWriter printer
 
-    TestDomainObject(Reader reader, PrintWriter printer) {
+    private Queue<String> variablesQueue
+
+    TestDomainObject(Reader reader, PrintWriter printer, Queue<String> variablesQueue) {
         this.reader = new Scanner(reader)
         this.printer = printer
+        this.variablesQueue = variablesQueue
+        this.variablesQueue.add('RESULT')
     }
 
     Integer getX() {
@@ -50,6 +57,19 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
             _X_ = reader.nextInt()
         }
         return _X_
+    }
+
+    Integer getC() {
+        if (!_C_) {
+            variablesQueue.add('C')
+            throw new CannotInputVariableException('C');
+        }
+        return _C_
+    }
+
+    void setC(Integer C) {
+        variablesQueue.remove('C')
+        this._C_ = C
     }
 
     Integer getT() {
@@ -66,6 +86,7 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
     }
 
     void setRESULT(List<String> result) {
+        variablesQueue.remove('RESULT')
         RESULT = result
     }
 
@@ -73,11 +94,31 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
     Object getProperty(String property) {
         if ('X'.equals(property))
             return getX()
-        else if ('T'.equals(property))
+
+        if ('T'.equals(property))
             return getT()
-        else if ('RESULT'.equals(property))
+
+        if ('C'.equals(property))
+            return getC()
+
+        if ('RESULT'.equals(property))
             return getRESULT()
 
         return super.getProperty(property)
+    }
+
+    @Override
+    void setProperty(String property, Object newValue) {
+        if ('C'.equals(property))
+            setC((Integer) newValue)
+        else if ('RESULT'.equals(property))
+            setRESULT((List<String>) newValue)
+        else
+            super.setProperty(property, newValue)
+    }
+
+    @Override
+    boolean isResolved() {
+        return RESULT != null
     }
 }

@@ -1,11 +1,11 @@
 rule('R1') {
-    _if_ = [{ T == 1 }]
+    _if_ = [{ C == 1 }]
     _then_ = { RESULT = [A] }
     _reason_ = 'R1'
 }
 rule('R2') {
     _if_ = [{ T == 2}]
-    _then_ = { result = [B] }
+    _then_ = { C = 1 }
     _reason_ = 'R2'
 }
 rule('R3') {

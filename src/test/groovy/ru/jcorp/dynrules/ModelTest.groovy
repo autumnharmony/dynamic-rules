@@ -22,6 +22,8 @@ import ru.jcorp.dynrules.util.DslSupport
 import ru.jcorp.dynrules.model.*
 import ru.jcorp.dynrules.production.DomainObject
 import ru.jcorp.dynrules.domain.TestDomainObject
+import ru.jcorp.dynrules.exceptions.CannotInputVariableException
+import ru.jcorp.dynrules.exceptions.UnresolvedRuleSystemException
 
 /**
  * @author artamonov
@@ -57,8 +59,19 @@ class ModelTest extends TestCase {
         assertEquals(2, ruleSet.size)
     }
 
-    void testDirectProductionalLogic() {
+    void testDirectProductionLogic() {
         directProcessStream(new StringReader('3 25'), null)
+        directProcessStream(new StringReader('2'), null)
+    }
+
+    void testDirectProductionalLogicFail() {
+        boolean exception = false
+        try {
+            directProcessStream(new StringReader('5'), null)
+        } catch (UnresolvedRuleSystemException e) {
+            exception = true
+        }
+        assertTrue(exception)
     }
 
     void directProcessStream(Reader streamReader, PrintWriter printer) {
@@ -70,31 +83,59 @@ class ModelTest extends TestCase {
         }
         Closure ruleDefs = sh.evaluate(script) as Closure
 
-        DomainObject dObj = new TestDomainObject(streamReader, printer)
+        Queue<String> variablesQueue = new LinkedList<String>()
+        DomainObject dObj = new TestDomainObject(streamReader, printer, variablesQueue)
         RuleSet ruleSet = RuleSet.build(ruleDefs)
-        directLogicProcess(ruleSet, dObj)
+        directLogicProcess(ruleSet, dObj, variablesQueue)
         assertEquals('AX', dObj.RESULT.get(0))
     }
 
-    private directLogicProcess(RuleSet ruleSet, DomainObject dObj) {
-        for (Rule rule : ruleSet.rules) {
-            boolean conjValue = true;
-            def conjIter = rule.ifStatements.iterator()
-            while (conjValue && conjIter.hasNext()) {
-                Closure conj = conjIter.next()
-                conj.delegate = dObj
-                conj.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
-                def conjResult = conj.call()
-                conjValue &= conjResult
+    private directLogicProcess(RuleSet ruleSet, DomainObject dObj, Queue<String> variablesQueue) {
+        int runCount = 0
+        boolean resolved = false
+        int failedCount = 0
+        while (!resolved && !variablesQueue.isEmpty() && runCount != ruleSet.size && failedCount != ruleSet.size) {
+            for (Rule rule : ruleSet.rules) {
+                if (!rule.failed) {
+                    boolean conjValue = true
+                    boolean exception = false
+
+                    def conjIter = rule.ifStatements.iterator()
+                    while (conjValue && conjIter.hasNext()) {
+                        Closure conj = conjIter.next()
+                        conj.delegate = dObj
+                        conj.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
+                        def conjResult
+                        try {
+                            conjResult = conj.call()
+                        } catch (CannotInputVariableException e) {
+                            exception = true
+                            break
+                        }
+                        if (conjResult != null)
+                            conjValue &= conjResult
+                    }
+
+                    if (!exception) {
+                        if (conjValue) {
+                            Closure thenClosure = rule.thenStatement
+                            thenClosure.delegate = dObj
+                            thenClosure.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
+                            thenClosure.call()
+                            resolved = dObj.resolved
+                            break
+                        } else {
+                            rule.setFailed(true)
+                            failedCount++
+                        }
+                    }
+                }
             }
-            if (conjValue) {
-                Closure thenClosure = rule.thenStatement
-                thenClosure.delegate = dObj
-                thenClosure.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
-                thenClosure.call()
-                break;
-            }
+            runCount++;
         }
+
+        if (!resolved)
+            throw new UnresolvedRuleSystemException();
     }
 
     public static void main(String[] args) {
