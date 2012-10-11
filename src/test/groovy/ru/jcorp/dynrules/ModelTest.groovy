@@ -170,8 +170,9 @@ class ModelTest extends TestCase {
     private indirectLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
         boolean hasRules = true
         Set<String> badValues = new HashSet<String>()
+        boolean resolved = false
 
-        while (!variablesStack.isEmpty() && hasRules) {
+        while (!resolved && !variablesStack.isEmpty() && hasRules) {
             boolean newTargetVariable = false
             List<Rule> withRule = new LinkedList<Rule>()
             hasRules = false
@@ -221,11 +222,14 @@ class ModelTest extends TestCase {
                         ruleFound = conjValue
                     }
                 }
+
                 if (!newTargetVariable && ruleFound && rule != null) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
                     thenClosure.call()
+                    resolved = dObj.resolved
                 }
             }
+
             if (!newTargetVariable && !ruleFound) {
                 if (!variablesStack.empty() && badValues.contains(variablesStack.peek())) {
                     variablesStack.removeAll(badValues)
@@ -233,7 +237,6 @@ class ModelTest extends TestCase {
                 if (!variablesStack.empty())
                     badValues.add(variablesStack.pop())
             }
-
         }
         if (!dObj.resolved) {
             throw new UnresolvedRuleSystemException()
