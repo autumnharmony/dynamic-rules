@@ -21,4 +21,14 @@ package ru.jcorp.dynrules.exceptions
  * @author artamonov
  */
 class RuleStatementException extends RuntimeException {
+
+    private final String ruleName
+
+    RuleStatementException(String ruleName) {
+        this.ruleName = ruleName
+    }
+
+    String getRuleName() {
+        return ruleName
+    }
 }

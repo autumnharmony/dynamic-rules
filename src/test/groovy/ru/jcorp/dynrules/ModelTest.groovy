@@ -145,7 +145,7 @@ class ModelTest extends TestCase {
                     if (conjResult instanceof Boolean)
                         conjValue = conjResult
                     else if (conjResult != null)
-                        throw new RuleStatementException()
+                        throw new RuleStatementException(rule.name)
                 }
 
                 if (allValuesResolved) {

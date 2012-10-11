@@ -21,4 +21,14 @@ package ru.jcorp.dynrules.exceptions
  * @author artamonov
  */
 class CannotReassignVariableException extends RuntimeException {
+
+    private final String variable
+
+    CannotReassignVariableException(String variable) {
+        this.variable = variable
+    }
+
+    String getVariable() {
+        return variable
+    }
 }

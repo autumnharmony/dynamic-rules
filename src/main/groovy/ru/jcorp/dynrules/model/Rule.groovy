@@ -17,6 +17,8 @@
 
 package ru.jcorp.dynrules.model
 
+import static ru.jcorp.dynrules.util.DslSupport.linkClosureToDelegate
+
 /**
  * @author artamonov
  */
@@ -67,10 +69,9 @@ class Rule {
 
     List<String> getVariables(Closure closure) {
         DelegateStub ds = new DelegateStub()
-        closure.delegate = ds
-        closure.resolveStrategy = groovy.lang.Closure.DELEGATE_ONLY
+        linkClosureToDelegate(closure, new DelegateStub())
         closure.call()
-        return ds.variables
+        return ds.getInspectedVariables()
     }
 
     List<String> getTargetVariables() {
@@ -85,7 +86,7 @@ class Rule {
         this.failed = failed
     }
 
-    private static class DelegateStub extends GroovyObjectSupport {
+    protected static class DelegateStub extends GroovyObjectSupport {
 
         private Set<String> variables = new LinkedHashSet<String>()
 
@@ -100,7 +101,7 @@ class Rule {
             variables.add property
         }
 
-        List<String> getVariables() {
+        List<String> getInspectedVariables() {
             return new ArrayList(variables)
         }
     }

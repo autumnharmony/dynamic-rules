@@ -62,7 +62,7 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
             super.setProperty(property, newValue)
         else {
             if (miscVariables.containsKey(property))
-                throw new CannotReassignVariableException()
+                throw new CannotReassignVariableException(property)
 
             miscVariables.put(property, newValue)
         }
