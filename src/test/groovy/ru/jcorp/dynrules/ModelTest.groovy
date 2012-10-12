@@ -66,10 +66,10 @@ class ModelTest extends TestCase {
         assertEquals('AX', dObj.RESULT.get(0))
     }
 
-    void testIndirectProductionLogic() {
-        def dObj = indirectProcessStream(new StringReader('3 25'), null)
+    void testInvertedProductionLogic() {
+        def dObj = invertedProcessStream(new StringReader('3 25'), null)
         assertEquals('AX', dObj.RESULT.get(0))
-        dObj = indirectProcessStream(new StringReader('2'), null)
+        dObj = invertedProcessStream(new StringReader('2'), null)
         assertEquals('AX', dObj.RESULT.get(0))
     }
 
@@ -83,10 +83,10 @@ class ModelTest extends TestCase {
         assertTrue(exception)
     }
 
-    void testIndirectProductionalLogicFail() {
+    void testInvertedProductionalLogicFail() {
         boolean exception = false
         try {
-            indirectProcessStream(new StringReader('5'), null)
+            invertedProcessStream(new StringReader('5'), null)
         } catch (UnresolvedRuleSystemException e) {
             exception = true
         }
@@ -103,13 +103,13 @@ class ModelTest extends TestCase {
         return dObj
     }
 
-    InvertedTestDomainObject indirectProcessStream(Reader streamReader, PrintWriter printer) {
+    InvertedTestDomainObject invertedProcessStream(Reader streamReader, PrintWriter printer) {
         Closure ruleDefs = loadClosureFromResource('/rules/test-set.groovy')
 
         Stack<String> variablesStack = new Stack<String>()
         InvertedTestDomainObject dObj = new InvertedTestDomainObject(streamReader, printer, variablesStack)
         RuleSet ruleSet = RuleSet.build(ruleDefs)
-        indirectLogicProcess(ruleSet, dObj, variablesStack)
+        invertedLogicProcess(ruleSet, dObj, variablesStack)
         return dObj
     }
 
@@ -167,12 +167,12 @@ class ModelTest extends TestCase {
             throw new UnresolvedRuleSystemException()
     }
 
-    private indirectLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
+    private invertedLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
         boolean hasRules = true
-        Set<String> badValues = new HashSet<String>()
         boolean resolved = false
+        boolean isCompatible = true
 
-        while (!resolved && !variablesStack.isEmpty() && hasRules) {
+        while (!resolved && !variablesStack.isEmpty() && hasRules && isCompatible) {
             boolean newTargetVariable = false
             List<Rule> withRule = new LinkedList<Rule>()
             hasRules = false
@@ -190,14 +190,10 @@ class ModelTest extends TestCase {
                 ruleFound = false
                 def rule = null
                 def itR = withRule.iterator()
-                while (!ruleFound && itR.hasNext()) {
+                while (!ruleFound && itR.hasNext() && !newTargetVariable) {
                     rule = itR.next()
-                    Boolean conjValue = true
+                    boolean conjValue = true
                     boolean allValuesResolved = true
-
-                    if (rule.failed) {
-                        conjValue = false
-                    }
 
                     def it = rule.ifStatements.iterator()
                     while (conjValue && it.hasNext()) {
@@ -208,7 +204,7 @@ class ModelTest extends TestCase {
                             conjResult = conj.call()
                         } catch (CannotInputVariableException e) {
                             allValuesResolved = false
-                            newTargetVariable = !badValues.contains(e.variable)
+                            newTargetVariable = true
                             break
                         }
 
@@ -231,14 +227,10 @@ class ModelTest extends TestCase {
             }
 
             if (!newTargetVariable && !ruleFound) {
-                if (!variablesStack.empty() && badValues.contains(variablesStack.peek())) {
-                    variablesStack.removeAll(badValues)
-                }
-                if (!variablesStack.empty())
-                    badValues.add(variablesStack.pop())
+                isCompatible = false
             }
         }
-        if (!dObj.resolved) {
+        if (!isCompatible) {
             throw new UnresolvedRuleSystemException()
         }
     }
