@@ -19,6 +19,8 @@ package ru.jcorp.dynrules.gui
 
 import javax.swing.JFrame
 import ru.jcorp.dynrules.DynamicRulesApp
+import javax.swing.JTabbedPane
+import javax.swing.border.EmptyBorder
 
 /**
  * @author artamonov
@@ -26,17 +28,19 @@ import ru.jcorp.dynrules.DynamicRulesApp
 class MainWindow extends JFrame {
 
     private DynamicRulesApp app
+    private JTabbedPane tabbedPane
 
     MainWindow() {
         this.app = DynamicRulesApp.instance
 
         this.size = [640, 480]
-        this.minimumSize = [640, 480]
+        this.minimumSize = [480, 320]
         this.defaultCloseOperation = EXIT_ON_CLOSE
         this.title = app.getMessage('application.title')
         this.iconImage = app.getResourceImage('application.png')
 
         buildMenu()
+        buildContentPane()
     }
 
     def buildMenu() {
@@ -44,7 +48,7 @@ class MainWindow extends JFrame {
             menu(text: app.getMessage('menu.file')) {
                 menuItem(text: app.getMessage('menu.file.new'), icon: app.getResourceIcon('menu/lightning.png'),
                         actionPerformed: {
-                            newRules()
+                            newConsultation()
                         })
                 menuItem(text: app.getMessage('menu.file.loadRules'), icon: app.getResourceIcon('menu/open.png'),
                         actionPerformed: {
@@ -66,10 +70,31 @@ class MainWindow extends JFrame {
         setJMenuBar(menuBar)
     }
 
-    def newRules(){}
+    def buildContentPane() {
+        def contentPane = app.guiBuilder.panel() {
+            borderLayout()
+            tabbedPane = tabbedPane(constraints: CENTER) {
+            }
+        }
+        setContentPane(contentPane)
+    }
 
-    def selectRules(){}
+    def newConsultation() {
+        def consultationPanel = app.guiBuilder.panel(border: new EmptyBorder(3, 5, 3, 5)) {
+            borderLayout()
 
-    def saveRules(){}
+            hbox(constraints: PAGE_END) {
+                hglue()
 
+                button(text: app.getMessage('edit.finish'), actionPerformed: {
+                    // stop consulation
+                    tabbedPane.remove(tabbedPane.selectedComponent)
+                })
+            }
+        }
+        tabbedPane.add(String.format(app.getMessage('consultation.title'), tabbedPane.tabCount + 1), consultationPanel)
+        tabbedPane.selectedComponent = consultationPanel
+    }
+
+    def selectRules() {}
 }
