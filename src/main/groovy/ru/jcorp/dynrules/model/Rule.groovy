@@ -32,8 +32,6 @@ class Rule {
 
     private String name = ''
 
-    private boolean failed = false
-
     Rule(String name) {
         this.name = name
     }
@@ -76,14 +74,6 @@ class Rule {
 
     List<String> getTargetVariables() {
         return getVariables(this.thenStatement)
-    }
-
-    boolean isFailed() {
-        return failed
-    }
-
-    void setFailed(boolean failed) {
-        this.failed = failed
     }
 
     protected static class DelegateStub extends GroovyObjectSupport {
