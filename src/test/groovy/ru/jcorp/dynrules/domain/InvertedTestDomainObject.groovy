@@ -21,11 +21,7 @@ import ru.jcorp.dynrules.production.DomainObject
 import ru.jcorp.dynrules.exceptions.CannotInputVariableException
 
 /**
- * Created with IntelliJ IDEA.
- * User: Comp
- * Date: 11.10.12
- * Time: 23:03
- * To change this template use File | Settings | File Templates.
+ * @author ulbekov
  */
 class InvertedTestDomainObject extends GroovyObjectSupport implements DomainObject {
 

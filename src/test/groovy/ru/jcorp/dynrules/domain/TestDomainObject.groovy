@@ -33,21 +33,17 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     private List<String> RESULT = null
 
-    final String A = 'AX'
+    static final String A = 'AX'
 
-    final String B = 'BX'
+    static final String B = 'BX'
 
     private Scanner reader
 
     private PrintWriter printer
 
-    private Set<String> variablesQueue
-
-    TestDomainObject(Reader reader, PrintWriter printer, Set<String> variablesQueue) {
+    TestDomainObject(Reader reader, PrintWriter printer) {
         this.reader = new Scanner(reader)
         this.printer = printer
-        this.variablesQueue = variablesQueue
-        this.variablesQueue.add('RESULT')
     }
 
     Integer getX() {
@@ -63,14 +59,12 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     Integer getC() {
         if (!_C_) {
-            variablesQueue.add('C')
             throw new CannotInputVariableException('C');
         }
         return _C_
     }
 
     void setC(Integer C) {
-        variablesQueue.remove('C')
         this._C_ = C
     }
 
@@ -90,7 +84,6 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
     }
 
     void setRESULT(List<String> result) {
-        variablesQueue.remove('RESULT')
         RESULT = result
         if (printer) {
             printer.println RESULT

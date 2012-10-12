@@ -18,31 +18,30 @@
 package ru.jcorp.dynrules.domain
 
 import ru.jcorp.dynrules.production.DomainObject
-import ru.jcorp.dynrules.exceptions.CannotReassignVariableException
 
 /**
  * @author artamonov
  */
 abstract class BasicDomainObject extends GroovyObjectSupport implements DomainObject {
 
-    protected Integer _G_ = null
+    protected Integer _W_ = null
     protected Integer _O_ = null
     protected Integer _V_ = null
     protected Integer _H_ = null
 
-    final CraneType MK = CraneType.MK
-    final CraneType NKPK = CraneType.NKPK
-    final CraneType KK = CraneType.KK
-    final CraneType MP = CraneType.MP
-    final CraneType SSK = CraneType.SSK
-    final CraneType BK = CraneType.BK
-    final CraneType PK = CraneType.PK
+    static final CraneType MK = CraneType.MK
+    static final CraneType NKPK = CraneType.NKPK
+    static final CraneType KK = CraneType.KK
+    static final CraneType MP = CraneType.MP
+    static final CraneType SSK = CraneType.SSK
+    static final CraneType BK = CraneType.BK
+    static final CraneType PK = CraneType.PK
 
-    final ObjectType WORKSHOP = ObjectType.WORKSHOP
-    final ObjectType WAREHOUSE = ObjectType.WAREHOUSE
-    final ObjectType POWERSTATION = ObjectType.POWERSTATION
-    final ObjectType RIVERPORT = ObjectType.RIVERPORT
-    final ObjectType CONSTRUCTION = ObjectType.CONSTRUCTION
+    static final ObjectType WORKSHOP = ObjectType.WORKSHOP
+    static final ObjectType WAREHOUSE = ObjectType.WAREHOUSE
+    static final ObjectType POWERSTATION = ObjectType.POWERSTATION
+    static final ObjectType RIVERPORT = ObjectType.RIVERPORT
+    static final ObjectType CONSTRUCTION = ObjectType.CONSTRUCTION
 
     private List<CraneType> _RESULT_ = null
 
@@ -61,9 +60,6 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
         if (hasProperty(property))
             super.setProperty(property, newValue)
         else {
-            if (miscVariables.containsKey(property))
-                throw new CannotReassignVariableException(property)
-
             miscVariables.put(property, newValue)
         }
     }
