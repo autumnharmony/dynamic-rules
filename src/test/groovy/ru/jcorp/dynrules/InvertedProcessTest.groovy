@@ -36,9 +36,9 @@ class InvertedProcessTest extends TestCase {
 
     void testInvertedProductionLogic() {
         def dObj = invertedProcessStream(new StringReader('3 25'), null)
-        assertEquals('AX', dObj.RESULT.get(0))
+        assertEquals(InvertedTestDomainObject.A, dObj.RESULT.get(0))
         dObj = invertedProcessStream(new StringReader('2'), null)
-        assertEquals('AX', dObj.RESULT.get(0))
+        assertEquals(InvertedTestDomainObject.A, dObj.RESULT.get(0))
     }
 
     void testInvertedProductionalLogicFail() {
@@ -62,32 +62,31 @@ class InvertedProcessTest extends TestCase {
     }
 
     private invertedLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
-        boolean hasRules = true
-        boolean resolved = false
         boolean isCompatible = true
+        Set<Rule> badRules = new HashSet<Rule>();
+        boolean newTargetVariable = false
+        Rule previousRule = null
 
-        while (!resolved && !variablesStack.isEmpty() && hasRules && isCompatible) {
-            boolean newTargetVariable = false
+        while (/*isCompatible && */ !variablesStack.isEmpty()) {
             List<Rule> withRule = new LinkedList<Rule>()
-            hasRules = false
+            newTargetVariable = false
             boolean ruleFound = false
 
             for (Rule r : ruleSet.rules) {
                 //add rules with current top stack variable to withRule set
                 if (r.getTargetVariables().contains(variablesStack.peek())) {
                     withRule.add(r)
-                    hasRules = true
                 }
             }
+            withRule.removeAll(badRules.asList())
 
-            if (hasRules) {
-                ruleFound = false
+            if (!withRule.isEmpty()) {
                 def rule = null
+
                 def itR = withRule.iterator()
                 while (!ruleFound && itR.hasNext() && !newTargetVariable) {
                     rule = itR.next()
                     boolean conjValue = true
-                    boolean allValuesResolved = true
 
                     def it = rule.ifStatements.iterator()
                     while (conjValue && it.hasNext()) {
@@ -97,8 +96,10 @@ class InvertedProcessTest extends TestCase {
                         try {
                             conjResult = conj.call()
                         } catch (CannotInputVariableException ignored) {
-                            allValuesResolved = false
                             newTargetVariable = true
+                            badRules.add(rule)
+                            previousRule = rule
+                            ruleFound = false
                             break
                         }
 
@@ -108,23 +109,25 @@ class InvertedProcessTest extends TestCase {
                             throw new RuleStatementException(rule.name)
                     }
 
-                    if (allValuesResolved) {
-                        ruleFound = conjValue
+                    if (!newTargetVariable && conjValue) {
+                        badRules.remove(previousRule)
+                        ruleFound = true
+                        previousRule = rule
                     }
                 }
 
                 if (!newTargetVariable && ruleFound && rule != null) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
                     thenClosure.call()
-                    resolved = dObj.resolved
+                    isCompatible = dObj.resolved
                 }
             }
 
             if (!newTargetVariable && !ruleFound) {
-                isCompatible = false
+                variablesStack.pop();
             }
         }
-        if (!isCompatible) {
+        if (!dObj.resolved) {
             throw new UnresolvedRuleSystemException()
         }
     }

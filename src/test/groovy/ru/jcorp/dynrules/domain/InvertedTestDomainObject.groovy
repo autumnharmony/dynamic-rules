@@ -33,9 +33,9 @@ class InvertedTestDomainObject extends GroovyObjectSupport implements DomainObje
 
     private List<String> RESULT = null
 
-    final String A = 'AX'
+    static final String A = 'AX'
 
-    final String B = 'BX'
+    static final String B = 'BX'
 
     private Scanner reader
 
