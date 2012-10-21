@@ -15,31 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.jcorp.dynrules.domain
+package ru.jcorp.dynrules.production.impl
 
-import ru.jcorp.dynrules.DynamicRulesApp
+import ru.jcorp.dynrules.production.*
+import ru.jcorp.dynrules.model.*
 
 /**
  * @author artamonov
  */
-public enum CraneType {
-
-    MK('crane.MK'),
-    NKPK('crane.NKPK'),
-    KK('crane.KK'),
-    MP('crane.MP'),
-    SSK('crane.SSK'),
-    BK('crane.BK'),
-    PK('crane.PK')
-
-    final String id
-
-    CraneType(String id) {
-        this.id = id
-    }
-
+class InvertedProduction implements ProductionMethod {
     @Override
-    String toString() {
-        return DynamicRulesApp.instance.getMessage(id)
+    void perform(RuleSet ruleSet) {
+
     }
 }

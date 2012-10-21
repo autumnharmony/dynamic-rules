@@ -17,10 +17,22 @@
 
 package ru.jcorp.dynrules.gui
 
-import javax.swing.JFrame
 import ru.jcorp.dynrules.DynamicRulesApp
+import ru.jcorp.dynrules.domain.impl.DirectDomainObject
+import ru.jcorp.dynrules.gui.controls.InputProvider
+import ru.jcorp.dynrules.model.RuleSet
+import ru.jcorp.dynrules.production.DomainObject
+import ru.jcorp.dynrules.production.Executor
+import ru.jcorp.dynrules.production.ProductionMethod
+import ru.jcorp.dynrules.production.impl.DirectProduction
+import ru.jcorp.dynrules.util.DslSupport
+
+import javax.swing.JFrame
 import javax.swing.JTabbedPane
 import javax.swing.border.EmptyBorder
+import javax.swing.JPanel
+import javax.swing.BoxLayout
+import javax.swing.JButton
 
 /**
  * @author artamonov
@@ -63,7 +75,7 @@ class MainWindow extends JFrame {
                         actionPerformed: {
                             AboutWindow about = new AboutWindow()
                             about.locationRelativeTo = this
-                            about.setVisible(true)
+                            about.visible = true
                         })
             }
         }
@@ -80,10 +92,22 @@ class MainWindow extends JFrame {
     }
 
     def newConsultation() {
+        JPanel dialogPane = null
+        JButton nextBtn = null
+        JButton unknownBtn = null
         def consultationPanel = app.guiBuilder.panel(border: new EmptyBorder(3, 5, 3, 5)) {
-            borderLayout()
+            boxLayout(axis: BoxLayout.Y_AXIS)
 
-            hbox(constraints: PAGE_END) {
+            dialogPane = panel(maximumSize: [300, 0]) {
+                gridLayout(columns: 2, rows: -1)
+            }
+
+            vglue()
+
+            hbox() {
+                nextBtn = button(text: app.getMessage('edit.next'))
+                unknownBtn = button(text: app.getMessage('edit.unknown'))
+
                 hglue()
 
                 button(text: app.getMessage('edit.finish'), actionPerformed: {
@@ -92,6 +116,15 @@ class MainWindow extends JFrame {
                 })
             }
         }
+        InputProvider inputProvider = new InputProvider(dialogPane, nextBtn, unknownBtn)
+        DomainObject domainObject = new DirectDomainObject(inputProvider)
+        ProductionMethod directMethod = new DirectProduction(domainObject)
+
+        RuleSet ruleSet = RuleSet.build DslSupport.loadClosureFromResource('/rules/set.groovy')
+
+        Executor executor = new Executor(directMethod, inputProvider, ruleSet)
+        executor.performProduction()
+
         tabbedPane.add(String.format(app.getMessage('consultation.title'), tabbedPane.tabCount + 1), consultationPanel)
         tabbedPane.selectedComponent = consultationPanel
     }

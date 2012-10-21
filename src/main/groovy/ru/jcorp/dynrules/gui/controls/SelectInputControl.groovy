@@ -21,47 +21,57 @@ import ru.jcorp.dynrules.DynamicRulesApp
 
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComponent
-import javax.swing.JPanel
+
+import javax.swing.Action
+import javax.swing.AbstractAction
+import java.awt.event.ActionEvent
+import javax.swing.JComboBox
 
 /**
  * @author artamonov
  */
-class SelectInputControl implements InputControl<Integer> {
+class SelectInputControl<T extends Enum> implements InputControl<T> {
 
-    private String message
-    private List<Enum> values
+    private Collection<T> values
 
-    private JPanel composition
+    private JComboBox component
+
+    private Action nextAction
+
     private DynamicRulesApp app
 
-    SelectInputControl(String message, List<Enum> values) {
-        this.message = message
-        this.values = values
+    private volatile Object value = null
+
+    SelectInputControl(Collection<T> values) {
         this.app = DynamicRulesApp.instance
+        this.values = values
+
+        this.nextAction = new AbstractAction() {
+            @Override
+            void actionPerformed(ActionEvent e) {
+                value = component.getSelectedItem()
+            }
+        }
 
         def modelItems = values.toArray(new Enum[values.size()])
         def itemsModel = new DefaultComboBoxModel<Enum>(modelItems)
-        composition = app.guiBuilder.panel() {
-            hbox {
-                label(value: message)
-                comboBox(model: itemsModel)
-                button(text: app.getMessage('edit.next'), actionPerformed: {
 
-                })
-                button(text: app.getMessage('edit.unknown'), actionPerformed: {
-
-                })
-            }
-        }
+        this.component = app.guiBuilder.comboBox(id: 'resultBox', model: itemsModel,
+                size: [150, -1], minimumSize: [150, -1], preferredSize: [150, -1])
     }
 
     @Override
-    Integer getValue() {
-        return null
+    T getValue() {
+        return (T) value
     }
 
     @Override
-    JComponent getComposition() {
-        return composition
+    JComponent getComponent() {
+        return component
+    }
+
+    @Override
+    Action getNextAction() {
+        return nextAction
     }
 }

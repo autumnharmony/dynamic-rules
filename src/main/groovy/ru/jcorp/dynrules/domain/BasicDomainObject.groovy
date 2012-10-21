@@ -17,6 +17,10 @@
 
 package ru.jcorp.dynrules.domain
 
+import org.apache.commons.lang.StringUtils
+import ru.jcorp.dynrules.gui.controls.InputProvider
+import ru.jcorp.dynrules.gui.controls.NumberInputControl
+import ru.jcorp.dynrules.gui.controls.SelectInputControl
 import ru.jcorp.dynrules.production.DomainObject
 
 /**
@@ -24,10 +28,10 @@ import ru.jcorp.dynrules.production.DomainObject
  */
 abstract class BasicDomainObject extends GroovyObjectSupport implements DomainObject {
 
-    protected Integer _W_ = null
-    protected Integer _O_ = null
-    protected Integer _V_ = null
-    protected Integer _H_ = null
+    protected Double _W_ = null
+    protected ObjectType _O_ = null
+    protected Double _V_ = null
+    protected Double _H_ = null
 
     static final CraneType MK = CraneType.MK
     static final CraneType NKPK = CraneType.NKPK
@@ -43,16 +47,27 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     static final ObjectType RIVERPORT = ObjectType.RIVERPORT
     static final ObjectType CONSTRUCTION = ObjectType.CONSTRUCTION
 
-    private List<CraneType> _RESULT_ = null
+    protected List<CraneType> _RESULT_ = null
 
     protected Map<String, Object> miscVariables = new HashMap<String, Object>()
+
+    protected final InputProvider inputProvider
+
+    BasicDomainObject(InputProvider inputProvider) {
+        this.inputProvider = inputProvider
+    }
 
     @Override
     Object getProperty(String property) {
         if (hasProperty(property))
             return super.getProperty(property)
-        else
-            return miscVariables.get(property)
+        else {
+            String lcProperty = StringUtils.lowerCase(property)
+            if (hasProperty(lcProperty) && !StringUtils.equals(property, lcProperty))
+                return super.getProperty(lcProperty)
+            else
+                return miscVariables.get(property)
+        }
     }
 
     @Override
@@ -60,12 +75,46 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
         if (hasProperty(property))
             super.setProperty(property, newValue)
         else {
-            miscVariables.put(property, newValue)
+            String lcProperty = StringUtils.lowerCase(property)
+            if (hasProperty(lcProperty) && !StringUtils.equals(property, lcProperty))
+                super.setProperty(lcProperty, newValue)
+            else
+                miscVariables.put(property, newValue)
         }
     }
 
     @Override
     boolean isResolved() {
         return _RESULT_ != null
+    }
+
+    Double getW() {
+        if (!_W_) {
+            _W_ = inputProvider.showInputControl(new NumberInputControl(), 'variable.input.W')
+        }
+        return _W_
+    }
+
+    ObjectType getO() {
+        if (!_O_) {
+            Collection<ObjectType> values = ObjectType.values()
+            _O_ = inputProvider.showInputControl(
+                    new SelectInputControl<ObjectType>(values), 'variable.input.O')
+        }
+        return _O_
+    }
+
+    Double getV() {
+        if (!_V_) {
+            _V_ = inputProvider.showInputControl(new NumberInputControl(), 'variable.input.V')
+        }
+        return _V_
+    }
+
+    Double getH() {
+        if (!_H_) {
+            _H_ = inputProvider.showInputControl(new NumberInputControl(), 'variable.input.H')
+        }
+        return _H_
     }
 }

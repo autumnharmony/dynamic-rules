@@ -15,31 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.jcorp.dynrules.domain
+package ru.jcorp.dynrules.domain.impl
 
-import ru.jcorp.dynrules.DynamicRulesApp
+import ru.jcorp.dynrules.domain.BasicDomainObject
+import ru.jcorp.dynrules.domain.CraneType
+import ru.jcorp.dynrules.gui.controls.InputProvider
 
 /**
  * @author artamonov
  */
-public enum CraneType {
+class DirectDomainObject extends BasicDomainObject {
 
-    MK('crane.MK'),
-    NKPK('crane.NKPK'),
-    KK('crane.KK'),
-    MP('crane.MP'),
-    SSK('crane.SSK'),
-    BK('crane.BK'),
-    PK('crane.PK')
-
-    final String id
-
-    CraneType(String id) {
-        this.id = id
+    DirectDomainObject(InputProvider inputProvider) {
+        super(inputProvider)
     }
 
-    @Override
-    String toString() {
-        return DynamicRulesApp.instance.getMessage(id)
+    def setResult(List<CraneType> result) {
+        this._RESULT_ = result
+        println(result) // todo remove this
+        this.inputProvider.printResult(result)
     }
 }

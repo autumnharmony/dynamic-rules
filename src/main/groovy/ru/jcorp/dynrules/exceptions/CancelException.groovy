@@ -15,31 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.jcorp.dynrules.domain
-
-import ru.jcorp.dynrules.DynamicRulesApp
+package ru.jcorp.dynrules.exceptions
 
 /**
  * @author artamonov
  */
-public enum CraneType {
-
-    MK('crane.MK'),
-    NKPK('crane.NKPK'),
-    KK('crane.KK'),
-    MP('crane.MP'),
-    SSK('crane.SSK'),
-    BK('crane.BK'),
-    PK('crane.PK')
-
-    final String id
-
-    CraneType(String id) {
-        this.id = id
-    }
-
-    @Override
-    String toString() {
-        return DynamicRulesApp.instance.getMessage(id)
-    }
+class CancelException extends RuntimeException {
 }

@@ -15,31 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.jcorp.dynrules.domain
+package ru.jcorp.dynrules.domain.impl
 
-import ru.jcorp.dynrules.DynamicRulesApp
+import ru.jcorp.dynrules.domain.BasicDomainObject
+import ru.jcorp.dynrules.gui.controls.InputProvider
 
 /**
  * @author artamonov
  */
-public enum CraneType {
+class InvertedDomainObject extends BasicDomainObject {
 
-    MK('crane.MK'),
-    NKPK('crane.NKPK'),
-    KK('crane.KK'),
-    MP('crane.MP'),
-    SSK('crane.SSK'),
-    BK('crane.BK'),
-    PK('crane.PK')
-
-    final String id
-
-    CraneType(String id) {
-        this.id = id
-    }
-
-    @Override
-    String toString() {
-        return DynamicRulesApp.instance.getMessage(id)
+    InvertedDomainObject(InputProvider inputProvider) {
+        super(inputProvider)
     }
 }

@@ -17,6 +17,8 @@
 
 package ru.jcorp.dynrules.domain
 
+import ru.jcorp.dynrules.DynamicRulesApp
+
 /**
  * @author artamonov
  */
@@ -32,5 +34,10 @@ enum ObjectType {
 
     ObjectType(String id) {
         this.id = id
+    }
+
+    @Override
+    String toString() {
+        return DynamicRulesApp.instance.getMessage(id)
     }
 }

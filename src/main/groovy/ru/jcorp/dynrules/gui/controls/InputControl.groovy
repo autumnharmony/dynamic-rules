@@ -18,6 +18,7 @@
 package ru.jcorp.dynrules.gui.controls
 
 import javax.swing.JComponent
+import javax.swing.Action
 
 /**
  * @author artamonov
@@ -26,5 +27,7 @@ public interface InputControl<T> {
 
     T getValue()
 
-    JComponent getComposition();
+    JComponent getComponent()
+
+    Action getNextAction()
 }

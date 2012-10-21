@@ -62,14 +62,12 @@ class InvertedProcessTest extends TestCase {
     }
 
     private invertedLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
-        boolean isCompatible = true
         Set<Rule> badRules = new HashSet<Rule>();
-        boolean newTargetVariable = false
         Rule previousRule = null
 
-        while (/*isCompatible && */ !variablesStack.isEmpty()) {
+        while (!variablesStack.isEmpty()) {
             List<Rule> withRule = new LinkedList<Rule>()
-            newTargetVariable = false
+            boolean newTargetVariable = false
             boolean ruleFound = false
 
             for (Rule r : ruleSet.rules) {
@@ -78,7 +76,7 @@ class InvertedProcessTest extends TestCase {
                     withRule.add(r)
                 }
             }
-            withRule.removeAll(badRules.asList())
+            withRule.removeAll(badRules)
 
             if (!withRule.isEmpty()) {
                 def rule = null
@@ -119,7 +117,6 @@ class InvertedProcessTest extends TestCase {
                 if (!newTargetVariable && ruleFound && rule != null) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
                     thenClosure.call()
-                    isCompatible = dObj.resolved
                 }
             }
 

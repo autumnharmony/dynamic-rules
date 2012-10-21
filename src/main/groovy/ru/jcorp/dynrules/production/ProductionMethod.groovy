@@ -17,9 +17,12 @@
 
 package ru.jcorp.dynrules.production
 
+import ru.jcorp.dynrules.model.RuleSet
+
 /**
  * @author artamonov
  */
 public interface ProductionMethod {
 
+    void perform(RuleSet ruleSet);
 }

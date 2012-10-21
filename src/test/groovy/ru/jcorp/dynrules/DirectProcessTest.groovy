@@ -66,9 +66,8 @@ class DirectProcessTest extends TestCase {
 
     private directLogicProcess(RuleSet ruleSet, DomainObject dObj) {
         int runCount = 0
-        boolean resolved = false
 
-        while (!resolved &&
+        while (!dObj.resolved &&
                 runCount != ruleSet.size) {
 
             for (Rule rule : ruleSet.rules) {
@@ -96,13 +95,12 @@ class DirectProcessTest extends TestCase {
                 if (allValuesResolved && conjValue) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
                     thenClosure.call()
-                    resolved = dObj.resolved
                 }
             }
             runCount++
         }
 
-        if (!resolved)
+        if (!dObj.resolved)
             throw new UnresolvedRuleSystemException()
     }
 

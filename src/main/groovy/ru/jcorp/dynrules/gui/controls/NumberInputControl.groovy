@@ -18,21 +18,53 @@
 package ru.jcorp.dynrules.gui.controls
 
 import javax.swing.JComponent
+import ru.jcorp.dynrules.DynamicRulesApp
+
+import javax.swing.Action
+import javax.swing.JTextField
+import java.awt.event.ActionEvent
+import javax.swing.AbstractAction
 
 /**
  * @author artamonov
  */
 class NumberInputControl implements InputControl<Double> {
 
-    private String message
+    private DynamicRulesApp app
 
-    @Override
-    def Double getValue() {
-        return null
+    private JTextField component
+
+    private Action nextAction
+
+    private volatile Double value = null
+
+    NumberInputControl() {
+        this.app = DynamicRulesApp.instance
+
+        this.nextAction = new AbstractAction() {
+            @Override
+            void actionPerformed(ActionEvent e) {
+                // todo throw validation exception
+                value = Double.parseDouble(component.text)
+            }
+        }
+
+        component = app.guiBuilder.textField(text: '0',
+                size: [150, -1], minimumSize: [150, -1], preferredSize: [150, -1])
     }
 
     @Override
-    JComponent getComposition() {
-        return null
+    def Double getValue() {
+        return value
+    }
+
+    @Override
+    JComponent getComponent() {
+        return component
+    }
+
+    @Override
+    Action getNextAction() {
+        return nextAction
     }
 }
