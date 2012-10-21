@@ -125,4 +125,13 @@ class InvertedTestDomainObject extends GroovyObjectSupport implements DomainObje
     boolean isResolved() {
         return RESULT != null
     }
+
+    @Override
+    void setReason(String reason) {
+    }
+
+    @Override
+    String getReason() {
+        return null
+    }
 }

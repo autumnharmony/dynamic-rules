@@ -24,6 +24,7 @@ import javax.swing.Action
 import javax.swing.JTextField
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
+import ru.jcorp.dynrules.exceptions.ValidationException
 
 /**
  * @author artamonov
@@ -44,8 +45,11 @@ class NumberInputControl implements InputControl<Double> {
         this.nextAction = new AbstractAction() {
             @Override
             void actionPerformed(ActionEvent e) {
-                // todo throw validation exception
-                value = Double.parseDouble(component.text)
+                try {
+                    value = Double.parseDouble(component.text)
+                } catch (NumberFormatException ignored) {
+                    throw new ValidationException()
+                }
             }
         }
 

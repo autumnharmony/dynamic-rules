@@ -122,4 +122,13 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
     boolean isResolved() {
         return RESULT != null
     }
+
+    @Override
+    void setReason(String reason) {
+    }
+
+    @Override
+    String getReason() {
+        return null
+    }
 }

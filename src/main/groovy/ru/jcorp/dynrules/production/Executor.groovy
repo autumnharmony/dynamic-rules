@@ -45,8 +45,9 @@ class Executor {
             void run() {
                 try {
                     productionMethod.perform(ruleSet)
-                } catch (UnresolvedRuleSystemException e) {
+                } catch (UnresolvedRuleSystemException ignored) {
                     inputProvider.printUnresolvedSystemMessage()
+                } catch (InterruptedException ignored) {
                 }
             }
         })
@@ -54,6 +55,7 @@ class Executor {
     }
 
     void cancel() {
-        executorThread.interrupt()
+        if (executorThread.alive)
+            executorThread.interrupt()
     }
 }

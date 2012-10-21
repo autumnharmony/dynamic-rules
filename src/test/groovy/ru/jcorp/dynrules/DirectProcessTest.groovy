@@ -19,14 +19,12 @@ package ru.jcorp.dynrules
 
 import junit.framework.TestCase
 import ru.jcorp.dynrules.domain.TestDomainObject
-import ru.jcorp.dynrules.exceptions.CannotInputVariableException
-import ru.jcorp.dynrules.exceptions.RuleStatementException
 import ru.jcorp.dynrules.exceptions.UnresolvedRuleSystemException
-import ru.jcorp.dynrules.model.Rule
 import ru.jcorp.dynrules.model.RuleSet
 import ru.jcorp.dynrules.production.DomainObject
 
-import static ru.jcorp.dynrules.util.DslSupport.linkClosureToDelegate
+import ru.jcorp.dynrules.production.impl.DirectProduction
+
 import static ru.jcorp.dynrules.util.DslSupport.loadClosureFromResource
 
 /**
@@ -65,43 +63,7 @@ class DirectProcessTest extends TestCase {
     }
 
     private directLogicProcess(RuleSet ruleSet, DomainObject dObj) {
-        int runCount = 0
-
-        while (!dObj.resolved &&
-                runCount != ruleSet.size) {
-
-            for (Rule rule : ruleSet.rules) {
-                boolean conjValue = true
-                boolean allValuesResolved = true
-
-                def conjIter = rule.ifStatements.iterator()
-                while (conjValue && conjIter.hasNext()) {
-                    Closure conj = linkClosureToDelegate(conjIter.next(), dObj)
-
-                    def conjResult
-                    try {
-                        conjResult = conj.call()
-                    } catch (CannotInputVariableException ignored) {
-                        allValuesResolved = false
-                        break
-                    }
-
-                    if (conjResult instanceof Boolean)
-                        conjValue = conjResult
-                    else if (conjResult != null)
-                        throw new RuleStatementException(rule.name)
-                }
-
-                if (allValuesResolved && conjValue) {
-                    Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
-                    thenClosure.call()
-                }
-            }
-            runCount++
-        }
-
-        if (!dObj.resolved)
-            throw new UnresolvedRuleSystemException()
+        new DirectProduction(dObj).perform(ruleSet)
     }
 
     public static void main(String[] args) {

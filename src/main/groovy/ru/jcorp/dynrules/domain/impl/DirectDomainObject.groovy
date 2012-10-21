@@ -32,7 +32,6 @@ class DirectDomainObject extends BasicDomainObject {
 
     def setResult(List<CraneType> result) {
         this._RESULT_ = result
-        println(result) // todo remove this
         this.inputProvider.printResult(result)
     }
 }

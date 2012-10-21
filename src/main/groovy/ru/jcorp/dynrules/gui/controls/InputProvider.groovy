@@ -26,6 +26,8 @@ import javax.swing.AbstractAction
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
+import ru.jcorp.dynrules.exceptions.ValidationException
+import javax.swing.JOptionPane
 
 /**
  * @author artamonov
@@ -35,11 +37,13 @@ class InputProvider {
     private JPanel dialogPane
     private JButton nextButton
     private JButton unknownBtn
+    private JLabel resultLabel
 
-    InputProvider(JPanel dialogPane, JButton nextButton, JButton unknownBtn) {
+    InputProvider(JPanel dialogPane, JButton nextButton, JButton unknownBtn, JLabel resultLabel) {
         this.dialogPane = dialogPane
         this.nextButton = nextButton
         this.unknownBtn = unknownBtn
+        this.resultLabel = resultLabel
     }
 
     def <T> T showInputControl(InputControl<T> inputControl, String messageCode) {
@@ -52,7 +56,17 @@ class InputProvider {
                 nextButton.setAction(new AbstractAction(nextButton.text) {
                     @Override
                     void actionPerformed(ActionEvent e) {
-                        inputControl.nextAction.actionPerformed(e)
+                        try {
+                            inputControl.nextAction.actionPerformed(e)
+                        } catch (ValidationException ignored) {
+                            def app = DynamicRulesApp.instance
+                            JOptionPane.showMessageDialog(inputControl.component,
+                                    app.getMessage("edit.validation"),
+                                    app.getMessage("edit.warning"),
+                                    JOptionPane.WARNING_MESSAGE)
+                            return
+                        }
+
                         inputControl.component.enabled = false
 
                         synchronized (inputControl) {
@@ -86,12 +100,15 @@ class InputProvider {
     void printResult(result) {
         nextButton.visible = false
         unknownBtn.visible = false
-        // todo print result here
+        if (result != null)
+            resultLabel.setText(result.toString().replace(',', '\n').replace('[', '').replace(']',''))
+        else
+            resultLabel.setText(DynamicRulesApp.instance.getMessage('result.unresolved'))
     }
 
     void printUnresolvedSystemMessage() {
         nextButton.visible = false
         unknownBtn.visible = false
-        // todo print unresolved message
+        resultLabel.setText(DynamicRulesApp.instance.getMessage('result.unresolved'))
     }
 }

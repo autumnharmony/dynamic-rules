@@ -27,12 +27,8 @@ import ru.jcorp.dynrules.production.ProductionMethod
 import ru.jcorp.dynrules.production.impl.DirectProduction
 import ru.jcorp.dynrules.util.DslSupport
 
-import javax.swing.JFrame
-import javax.swing.JTabbedPane
 import javax.swing.border.EmptyBorder
-import javax.swing.JPanel
-import javax.swing.BoxLayout
-import javax.swing.JButton
+import javax.swing.*
 
 /**
  * @author artamonov
@@ -41,6 +37,8 @@ class MainWindow extends JFrame {
 
     private DynamicRulesApp app
     private JTabbedPane tabbedPane
+
+    private Map<Long, Executor> executorMap = new WeakHashMap<Long, Executor>()
 
     MainWindow() {
         this.app = DynamicRulesApp.instance
@@ -92,31 +90,43 @@ class MainWindow extends JFrame {
     }
 
     def newConsultation() {
+        final Long execNumber = new Date().time
+
         JPanel dialogPane = null
         JButton nextBtn = null
         JButton unknownBtn = null
+        JLabel resultLabel = null
         def consultationPanel = app.guiBuilder.panel(border: new EmptyBorder(3, 5, 3, 5)) {
-            boxLayout(axis: BoxLayout.Y_AXIS)
+            borderLayout()
 
-            dialogPane = panel(maximumSize: [300, 0]) {
-                gridLayout(columns: 2, rows: -1)
+            hbox(constraints: PAGE_START) {
+                hglue()
+                dialogPane = panel {
+                    gridLayout(columns: 2, rows: -1)
+                }
+                hglue()
             }
 
-            vglue()
+            hbox(constraints: CENTER) {
+                hglue()
+                resultLabel = label()
+                hglue()
+            }
 
-            hbox() {
+            hbox(constraints: PAGE_END) {
                 nextBtn = button(text: app.getMessage('edit.next'))
                 unknownBtn = button(text: app.getMessage('edit.unknown'))
 
                 hglue()
 
                 button(text: app.getMessage('edit.finish'), actionPerformed: {
+                    executorMap.get(execNumber)?.cancel()
                     // stop consulation
                     tabbedPane.remove(tabbedPane.selectedComponent)
                 })
             }
         }
-        InputProvider inputProvider = new InputProvider(dialogPane, nextBtn, unknownBtn)
+        InputProvider inputProvider = new InputProvider(dialogPane, nextBtn, unknownBtn, resultLabel)
         DomainObject domainObject = new DirectDomainObject(inputProvider)
         ProductionMethod directMethod = new DirectProduction(domainObject)
 
@@ -125,9 +135,13 @@ class MainWindow extends JFrame {
         Executor executor = new Executor(directMethod, inputProvider, ruleSet)
         executor.performProduction()
 
+        executorMap.put(execNumber, executor)
+
         tabbedPane.add(String.format(app.getMessage('consultation.title'), tabbedPane.tabCount + 1), consultationPanel)
         tabbedPane.selectedComponent = consultationPanel
     }
 
-    def selectRules() {}
+    def selectRules() {
+
+    }
 }

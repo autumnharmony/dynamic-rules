@@ -66,6 +66,11 @@ class DirectProduction implements ProductionMethod {
                 if (allValuesResolved && conjValue) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, domainObject)
                     thenClosure.call()
+
+                    if (domainObject.resolved) {
+                        domainObject.reason = rule.reason
+                        break
+                    }
                 }
             }
             runCount++

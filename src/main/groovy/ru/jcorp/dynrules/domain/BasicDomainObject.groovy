@@ -33,6 +33,8 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     protected Double _V_ = null
     protected Double _H_ = null
 
+    protected String reason
+
     static final CraneType MK = CraneType.MK
     static final CraneType NKPK = CraneType.NKPK
     static final CraneType KK = CraneType.KK
@@ -116,5 +118,15 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
             _H_ = inputProvider.showInputControl(new NumberInputControl(), 'variable.input.H')
         }
         return _H_
+    }
+
+    @Override
+    void setReason(String reason) {
+        this.reason = reason
+    }
+
+    @Override
+    String getReason() {
+        return reason
     }
 }
