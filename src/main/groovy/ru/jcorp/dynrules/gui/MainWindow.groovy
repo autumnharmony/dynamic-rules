@@ -32,6 +32,7 @@ import ru.jcorp.dynrules.domain.impl.DirectDomainObject
 import ru.jcorp.dynrules.domain.impl.InvertedDomainObject
 import ru.jcorp.dynrules.production.impl.InvertedProduction
 import java.awt.event.ActionEvent
+import javax.swing.filechooser.FileNameExtensionFilter
 
 /**
  * @author artamonov
@@ -42,6 +43,8 @@ class MainWindow extends JFrame {
     private JTabbedPane tabbedPane
 
     private Map<Long, Executor> executorMap = new WeakHashMap<Long, Executor>()
+
+    private RuleSet ruleSet
 
     MainWindow() {
         this.app = DynamicRulesApp.instance
@@ -54,6 +57,8 @@ class MainWindow extends JFrame {
 
         buildMenu()
         buildContentPane()
+
+        ruleSet = RuleSet.build DslSupport.loadClosureFromResource('/rules/set.groovy')
     }
 
     def buildMenu() {
@@ -140,7 +145,7 @@ class MainWindow extends JFrame {
                 app.getMessage('edit.selectProduction'),
                 app.getMessage('edit.options'), JOptionPane.DEFAULT_OPTION,
                 JOptionPane.INFORMATION_MESSAGE, null,
-                options.toArray(), "");
+                options.toArray(), '');
 
         ProductionMethod method
         DomainObject domainObject
@@ -158,11 +163,9 @@ class MainWindow extends JFrame {
 
             @Override
             void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(MainWindow.this, domainObject.reason, app.getMessage("edit.reason"), JOptionPane.INFORMATION_MESSAGE)
+                JOptionPane.showMessageDialog(MainWindow.this, domainObject.reason, app.getMessage('edit.reason'), JOptionPane.INFORMATION_MESSAGE)
             }
         })
-
-        RuleSet ruleSet = RuleSet.build DslSupport.loadClosureFromResource('/rules/set.groovy')
 
         Executor executor = new Executor(method, inputProvider, ruleSet)
         executor.performProduction()
@@ -176,6 +179,17 @@ class MainWindow extends JFrame {
     }
 
     def selectRules() {
-
+        JFileChooser fileChooser = new JFileChooser()
+        fileChooser.fileFilter = new FileNameExtensionFilter(app.getMessage('edit.ruleFiles'), 'groovy')
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            FileInputStream fs = new FileInputStream(fileChooser.selectedFile)
+            try {
+                RuleSet newRuleSet = RuleSet.build DslSupport.loadClosureFromStream(fs)
+                ruleSet = newRuleSet
+                JOptionPane.showMessageDialog(this, app.getMessage('edit.successLoad'), app.getMessage('edit.success'), JOptionPane.INFORMATION_MESSAGE)
+            } catch (Exception ignored) {
+                JOptionPane.showMessageDialog(this, app.getMessage('edit.rulesError'), app.getMessage('edit.error'), JOptionPane.ERROR_MESSAGE)
+            }
+        }
     }
 }
