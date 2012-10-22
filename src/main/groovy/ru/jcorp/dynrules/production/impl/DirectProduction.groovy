@@ -28,7 +28,7 @@ import static ru.jcorp.dynrules.util.DslSupport.linkClosureToDelegate
  */
 class DirectProduction implements ProductionMethod {
 
-    private DomainObject domainObject
+    private final DomainObject domainObject
 
     DirectProduction(DomainObject domainObject) {
         this.domainObject = domainObject

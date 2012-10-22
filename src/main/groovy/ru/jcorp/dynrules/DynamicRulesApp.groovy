@@ -70,16 +70,8 @@ class DynamicRulesApp {
         instance.run()
     }
 
-    MainWindow getMainWindow() {
-        return mainWindow
-    }
-
     SwingBuilder getGuiBuilder() {
         return guiBuilder
-    }
-
-    ResourceBundle getResourceBundle() {
-        return resourceBundle
     }
 
     static DynamicRulesApp getInstance() {

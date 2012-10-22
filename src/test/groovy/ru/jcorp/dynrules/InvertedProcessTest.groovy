@@ -19,14 +19,11 @@ package ru.jcorp.dynrules
 
 import junit.framework.TestCase
 import ru.jcorp.dynrules.domain.InvertedTestDomainObject
-import ru.jcorp.dynrules.exceptions.CannotInputVariableException
-import ru.jcorp.dynrules.exceptions.RuleStatementException
 import ru.jcorp.dynrules.exceptions.UnresolvedRuleSystemException
-import ru.jcorp.dynrules.model.Rule
 import ru.jcorp.dynrules.model.RuleSet
 import ru.jcorp.dynrules.production.DomainObject
+import ru.jcorp.dynrules.production.impl.InvertedProduction
 
-import static ru.jcorp.dynrules.util.DslSupport.linkClosureToDelegate
 import static ru.jcorp.dynrules.util.DslSupport.loadClosureFromResource
 
 /**
@@ -62,70 +59,6 @@ class InvertedProcessTest extends TestCase {
     }
 
     private invertedLogicProcess(RuleSet ruleSet, DomainObject dObj, Stack<String> variablesStack) {
-        Set<Rule> badRules = new HashSet<Rule>();
-        Rule previousRule = null
-
-        while (!variablesStack.isEmpty()) {
-            List<Rule> withRule = new LinkedList<Rule>()
-            boolean newTargetVariable = false
-            boolean ruleFound = false
-
-            for (Rule r : ruleSet.rules) {
-                //add rules with current top stack variable to withRule set
-                if (r.getTargetVariables().contains(variablesStack.peek())) {
-                    withRule.add(r)
-                }
-            }
-            withRule.removeAll(badRules)
-
-            if (!withRule.isEmpty()) {
-                def rule = null
-
-                def itR = withRule.iterator()
-                while (!ruleFound && itR.hasNext() && !newTargetVariable) {
-                    rule = itR.next()
-                    boolean conjValue = true
-
-                    def it = rule.ifStatements.iterator()
-                    while (conjValue && it.hasNext()) {
-                        Closure conj = linkClosureToDelegate(it.next(), dObj)
-
-                        def conjResult
-                        try {
-                            conjResult = conj.call()
-                        } catch (CannotInputVariableException ignored) {
-                            newTargetVariable = true
-                            badRules.add(rule)
-                            previousRule = rule
-                            ruleFound = false
-                            break
-                        }
-
-                        if (conjResult instanceof Boolean)
-                            conjValue = conjResult
-                        else if (conjResult != null)
-                            throw new RuleStatementException(rule.name)
-                    }
-
-                    if (!newTargetVariable && conjValue) {
-                        badRules.remove(previousRule)
-                        ruleFound = true
-                        previousRule = rule
-                    }
-                }
-
-                if (!newTargetVariable && ruleFound && rule != null) {
-                    Closure thenClosure = linkClosureToDelegate(rule.thenStatement, dObj)
-                    thenClosure.call()
-                }
-            }
-
-            if (!newTargetVariable && !ruleFound) {
-                variablesStack.pop();
-            }
-        }
-        if (!dObj.resolved) {
-            throw new UnresolvedRuleSystemException()
-        }
+        new InvertedProduction(dObj, variablesStack).perform(ruleSet)
     }
 }
