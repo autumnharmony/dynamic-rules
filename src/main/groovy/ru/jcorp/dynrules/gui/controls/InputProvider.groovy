@@ -66,8 +66,8 @@ class InputProvider {
                         } catch (ValidationException ignored) {
                             def app = DynamicRulesApp.instance
                             JOptionPane.showMessageDialog(inputControl.component,
-                                    app.getMessage("edit.validation"),
-                                    app.getMessage("edit.warning"),
+                                    app.getMessage('edit.validation'),
+                                    app.getMessage('edit.warning'),
                                     JOptionPane.WARNING_MESSAGE)
                             return
                         }
@@ -135,5 +135,18 @@ class InputProvider {
             }
         })
         dialogPane.getRootPane()?.repaint()
+    }
+
+    void showProductionError(Exception e) {
+        e.printStackTrace()
+        EventQueue.invokeAndWait(new Runnable() {
+            @Override
+            void run() {
+                JOptionPane.showMessageDialog(dialogPane,
+                        DynamicRulesApp.instance.getMessage('edit.productionError'),
+                        DynamicRulesApp.instance.getMessage('edit.error'),
+                        JOptionPane.ERROR_MESSAGE)
+            }
+        })
     }
 }

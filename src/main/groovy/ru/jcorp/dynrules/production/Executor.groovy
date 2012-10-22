@@ -20,6 +20,8 @@ package ru.jcorp.dynrules.production
 import ru.jcorp.dynrules.model.RuleSet
 import ru.jcorp.dynrules.gui.controls.InputProvider
 import ru.jcorp.dynrules.exceptions.UnresolvedRuleSystemException
+import java.awt.EventQueue
+import javax.swing.JOptionPane
 
 /**
  * @author artamonov
@@ -48,6 +50,8 @@ class Executor {
                 } catch (UnresolvedRuleSystemException ignored) {
                     inputProvider.printUnresolvedSystemMessage()
                 } catch (InterruptedException ignored) {
+                } catch (Exception e) {
+                    inputProvider.showProductionError(e)
                 }
             }
         })

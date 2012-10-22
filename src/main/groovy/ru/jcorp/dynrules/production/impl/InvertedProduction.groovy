@@ -97,6 +97,8 @@ class InvertedProduction implements ProductionMethod {
                 if (!newTargetVariable && ruleFound && rule != null) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, domainObject)
                     thenClosure.call()
+                    if (domainObject.resolved)
+                        domainObject.reason = rule.reason
                 }
             }
 
