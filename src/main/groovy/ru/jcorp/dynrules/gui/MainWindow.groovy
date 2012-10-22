@@ -18,7 +18,6 @@
 package ru.jcorp.dynrules.gui
 
 import ru.jcorp.dynrules.DynamicRulesApp
-import ru.jcorp.dynrules.domain.impl.DirectDomainObject
 import ru.jcorp.dynrules.gui.controls.InputProvider
 import ru.jcorp.dynrules.model.RuleSet
 import ru.jcorp.dynrules.production.DomainObject
@@ -29,6 +28,10 @@ import ru.jcorp.dynrules.util.DslSupport
 
 import javax.swing.border.EmptyBorder
 import javax.swing.*
+import ru.jcorp.dynrules.domain.impl.DirectDomainObject
+import ru.jcorp.dynrules.domain.impl.InvertedDomainObject
+import ru.jcorp.dynrules.production.impl.InvertedProduction
+import java.awt.event.ActionEvent
 
 /**
  * @author artamonov
@@ -95,7 +98,8 @@ class MainWindow extends JFrame {
         JPanel dialogPane = null
         JButton nextBtn = null
         JButton unknownBtn = null
-        JLabel resultLabel = null
+        JButton reasonBtn = null
+        JPanel resultContainer = null
         def consultationPanel = app.guiBuilder.panel(border: new EmptyBorder(3, 5, 3, 5)) {
             borderLayout()
 
@@ -109,13 +113,16 @@ class MainWindow extends JFrame {
 
             hbox(constraints: CENTER) {
                 hglue()
-                resultLabel = label()
+                resultContainer = panel() {
+                    boxLayout(axis: BoxLayout.Y_AXIS)
+                }
                 hglue()
             }
 
             hbox(constraints: PAGE_END) {
                 nextBtn = button(text: app.getMessage('edit.next'))
                 unknownBtn = button(text: app.getMessage('edit.unknown'))
+                reasonBtn = button(text: app.getMessage('edit.reason'), visible: false)
 
                 hglue()
 
@@ -126,18 +133,45 @@ class MainWindow extends JFrame {
                 })
             }
         }
-        InputProvider inputProvider = new InputProvider(dialogPane, nextBtn, unknownBtn, resultLabel)
-        DomainObject domainObject = new DirectDomainObject(inputProvider)
-        ProductionMethod directMethod = new DirectProduction(domainObject)
+        InputProvider inputProvider = new InputProvider(dialogPane, nextBtn, unknownBtn, reasonBtn, resultContainer)
+
+        def options = [app.getMessage('production.direct'), app.getMessage('production.inverted')]
+        def option = JOptionPane.showOptionDialog(this,
+                app.getMessage('edit.selectProduction'),
+                app.getMessage('edit.options'), JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE, null,
+                options.toArray(), "");
+
+        ProductionMethod method
+        DomainObject domainObject
+
+        if (option == 0) {
+            domainObject = new DirectDomainObject(inputProvider)
+            method = new DirectProduction(domainObject)
+        } else {
+            Stack<String> vars = new Stack<String>()
+            domainObject = new InvertedDomainObject(inputProvider, vars)
+            method = new InvertedProduction(domainObject, vars)
+        }
+
+        reasonBtn.setAction(new AbstractAction(reasonBtn.text) {
+
+            @Override
+            void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(MainWindow.this, domainObject.reason, app.getMessage("edit.reason"), JOptionPane.INFORMATION_MESSAGE)
+            }
+        })
 
         RuleSet ruleSet = RuleSet.build DslSupport.loadClosureFromResource('/rules/set.groovy')
 
-        Executor executor = new Executor(directMethod, inputProvider, ruleSet)
+        Executor executor = new Executor(method, inputProvider, ruleSet)
         executor.performProduction()
 
         executorMap.put(execNumber, executor)
 
-        tabbedPane.add(String.format(app.getMessage('consultation.title'), tabbedPane.tabCount + 1), consultationPanel)
+        tabbedPane.add(
+                String.format(app.getMessage('consultation.title'), tabbedPane.tabCount + 1, options.get(option))
+                , consultationPanel)
         tabbedPane.selectedComponent = consultationPanel
     }
 

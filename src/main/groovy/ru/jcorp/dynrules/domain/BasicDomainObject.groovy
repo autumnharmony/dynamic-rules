@@ -22,6 +22,7 @@ import ru.jcorp.dynrules.gui.controls.InputProvider
 import ru.jcorp.dynrules.gui.controls.NumberInputControl
 import ru.jcorp.dynrules.gui.controls.SelectInputControl
 import ru.jcorp.dynrules.production.DomainObject
+import ru.jcorp.dynrules.exceptions.CannotInputVariableException
 
 /**
  * @author artamonov
@@ -67,8 +68,10 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
             String lcProperty = StringUtils.lowerCase(property)
             if (hasProperty(lcProperty) && !StringUtils.equals(property, lcProperty))
                 return super.getProperty(lcProperty)
-            else
+            else if (miscVariables.containsKey(property))
                 return miscVariables.get(property)
+            else
+                throw new CannotInputVariableException(property)
         }
     }
 

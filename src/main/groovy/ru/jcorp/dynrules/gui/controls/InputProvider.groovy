@@ -28,6 +28,9 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import ru.jcorp.dynrules.exceptions.ValidationException
 import javax.swing.JOptionPane
+import javax.swing.JList
+import javax.swing.border.LineBorder
+import java.awt.Color
 
 /**
  * @author artamonov
@@ -36,14 +39,16 @@ class InputProvider {
 
     private JPanel dialogPane
     private JButton nextButton
+    private JButton reasonBtn
     private JButton unknownBtn
-    private JLabel resultLabel
+    private JPanel resultContainer
 
-    InputProvider(JPanel dialogPane, JButton nextButton, JButton unknownBtn, JLabel resultLabel) {
+    InputProvider(JPanel dialogPane, JButton nextButton, JButton unknownBtn, JButton reasonBtn, JPanel resultContainer) {
         this.dialogPane = dialogPane
         this.nextButton = nextButton
+        this.reasonBtn = reasonBtn
         this.unknownBtn = unknownBtn
-        this.resultLabel = resultLabel
+        this.resultContainer = resultContainer
     }
 
     def <T> T showInputControl(InputControl<T> inputControl, String messageCode) {
@@ -90,7 +95,7 @@ class InputProvider {
                 inputControl.component.setPreferredSize(new Dimension(-1, 30))
             }
         })
-        dialogPane.getRootPane().repaint()
+        dialogPane.getRootPane()?.repaint()
         synchronized (inputControl) {
             inputControl.wait()
         }
@@ -98,17 +103,37 @@ class InputProvider {
     }
 
     void printResult(result) {
-        nextButton.visible = false
-        unknownBtn.visible = false
-        if (result != null)
-            resultLabel.setText(result.toString().replace(',', '\n').replace('[', '').replace(']',''))
-        else
-            resultLabel.setText(DynamicRulesApp.instance.getMessage('result.unresolved'))
+        EventQueue.invokeAndWait(new Runnable() {
+            @Override
+            void run() {
+                nextButton.visible = false
+                unknownBtn.visible = false
+                if (result != null) {
+                    JList resultList = new JList((result as Collection).toArray())
+                    resultList.setBorder(new LineBorder(Color.BLACK))
+                    resultContainer.add(resultList)
+                    reasonBtn.visible = true
+                } else {
+                    JLabel resultLabel = new JLabel()
+                    resultLabel.setText(DynamicRulesApp.instance.getMessage('result.unresolved'))
+                    resultContainer.add(resultLabel)
+                }
+            }
+        })
+        dialogPane.getRootPane()?.repaint()
     }
 
     void printUnresolvedSystemMessage() {
-        nextButton.visible = false
-        unknownBtn.visible = false
-        resultLabel.setText(DynamicRulesApp.instance.getMessage('result.unresolved'))
+        EventQueue.invokeAndWait(new Runnable() {
+            @Override
+            void run() {
+                JLabel resultLabel = new JLabel()
+                nextButton.visible = false
+                unknownBtn.visible = false
+                resultLabel.setText(DynamicRulesApp.instance.getMessage('result.unresolved'))
+                resultContainer.add(resultLabel)
+            }
+        })
+        dialogPane.getRootPane()?.repaint()
     }
 }

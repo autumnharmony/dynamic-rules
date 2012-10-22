@@ -19,13 +19,25 @@ package ru.jcorp.dynrules.domain.impl
 
 import ru.jcorp.dynrules.domain.BasicDomainObject
 import ru.jcorp.dynrules.gui.controls.InputProvider
+import ru.jcorp.dynrules.domain.CraneType
 
 /**
  * @author artamonov
  */
 class InvertedDomainObject extends BasicDomainObject {
 
-    InvertedDomainObject(InputProvider inputProvider) {
+    private Stack<String> variablesStack
+
+    InvertedDomainObject(InputProvider inputProvider, Stack<String> variablesStack) {
         super(inputProvider)
+
+        this.variablesStack = variablesStack
+        this.variablesStack.add('RESULT')
+    }
+
+    def setResult(List<CraneType> result) {
+        this._RESULT_ = result
+        this.variablesStack.remove('RESULT')
+        this.inputProvider.printResult(result)
     }
 }
