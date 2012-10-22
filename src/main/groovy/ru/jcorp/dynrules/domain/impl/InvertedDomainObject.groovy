@@ -20,6 +20,8 @@ package ru.jcorp.dynrules.domain.impl
 import ru.jcorp.dynrules.domain.BasicDomainObject
 import ru.jcorp.dynrules.gui.controls.InputProvider
 import ru.jcorp.dynrules.domain.CraneType
+import org.apache.commons.lang.StringUtils
+import ru.jcorp.dynrules.exceptions.CannotInputVariableException
 
 /**
  * @author artamonov
@@ -39,5 +41,37 @@ class InvertedDomainObject extends BasicDomainObject {
         this._RESULT_ = result
         this.variablesStack.remove('RESULT')
         this.inputProvider.printResult(result)
+    }
+
+    @Override
+    Object getProperty(String property) {
+        if (hasProperty(property))
+            return super.getProperty(property)
+        else {
+            String lcProperty = StringUtils.lowerCase(property)
+            if (hasProperty(lcProperty) && !StringUtils.equals(property, lcProperty))
+                return super.getProperty(lcProperty)
+            else if (miscVariables.containsKey(property))
+                return miscVariables.get(property)
+            else {
+                variablesStack.add(property)
+                throw new CannotInputVariableException(property)
+            }
+        }
+    }
+
+    @Override
+    void setProperty(String property, Object newValue) {
+        if (hasProperty(property))
+            super.setProperty(property, newValue)
+        else {
+            String lcProperty = StringUtils.lowerCase(property)
+            if (hasProperty(lcProperty) && !StringUtils.equals(property, lcProperty))
+                super.setProperty(lcProperty, newValue)
+            else {
+                miscVariables.put(property, newValue)
+                variablesStack.remove(property)
+            }
+        }
     }
 }

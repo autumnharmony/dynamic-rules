@@ -61,34 +61,6 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     }
 
     @Override
-    Object getProperty(String property) {
-        if (hasProperty(property))
-            return super.getProperty(property)
-        else {
-            String lcProperty = StringUtils.lowerCase(property)
-            if (hasProperty(lcProperty) && !StringUtils.equals(property, lcProperty))
-                return super.getProperty(lcProperty)
-            else if (miscVariables.containsKey(property))
-                return miscVariables.get(property)
-            else
-                throw new CannotInputVariableException(property)
-        }
-    }
-
-    @Override
-    void setProperty(String property, Object newValue) {
-        if (hasProperty(property))
-            super.setProperty(property, newValue)
-        else {
-            String lcProperty = StringUtils.lowerCase(property)
-            if (hasProperty(lcProperty) && !StringUtils.equals(property, lcProperty))
-                super.setProperty(lcProperty, newValue)
-            else
-                miscVariables.put(property, newValue)
-        }
-    }
-
-    @Override
     boolean isResolved() {
         return _RESULT_ != null
     }
