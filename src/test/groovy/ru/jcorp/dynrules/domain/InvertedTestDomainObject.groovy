@@ -64,7 +64,7 @@ class InvertedTestDomainObject extends GroovyObjectSupport implements DomainObje
     Integer getC() {
         if (!_C_) {
             variablesStack.add('C')
-            throw new CannotInputVariableException('C');
+            throw new CannotInputVariableException('C')
         }
         return _C_
     }

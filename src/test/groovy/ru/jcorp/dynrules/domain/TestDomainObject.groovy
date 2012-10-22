@@ -59,7 +59,7 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
 
     Integer getC() {
         if (!_C_) {
-            throw new CannotInputVariableException('C');
+            throw new CannotInputVariableException('C')
         }
         return _C_
     }
