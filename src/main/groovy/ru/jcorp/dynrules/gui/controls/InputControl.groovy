@@ -30,4 +30,6 @@ public interface InputControl<T> {
     JComponent getComponent()
 
     Action getNextAction()
+
+    void clear();
 }

@@ -83,6 +83,7 @@ class InputProvider {
 
                     @Override
                     void actionPerformed(ActionEvent e) {
+                        inputControl.clear()
                         inputControl.component.enabled = false
 
                         synchronized (inputControl) {

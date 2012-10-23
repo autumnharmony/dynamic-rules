@@ -48,6 +48,7 @@ class DynamicRulesApp {
     }
 
     private void run() {
+        System.setProperty('file.encoding', 'UTF-8')
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

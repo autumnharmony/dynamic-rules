@@ -71,4 +71,9 @@ class NumberInputControl implements InputControl<Double> {
     Action getNextAction() {
         return nextAction
     }
+
+    @Override
+    void clear() {
+        component.text = ''
+    }
 }

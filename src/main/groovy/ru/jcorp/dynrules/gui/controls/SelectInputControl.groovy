@@ -74,4 +74,9 @@ class SelectInputControl<T extends Enum> implements InputControl<T> {
     Action getNextAction() {
         return nextAction
     }
+
+    @Override
+    void clear() {
+        component.setSelectedItem(null)
+    }
 }

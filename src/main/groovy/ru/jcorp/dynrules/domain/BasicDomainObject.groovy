@@ -17,12 +17,10 @@
 
 package ru.jcorp.dynrules.domain
 
-import org.apache.commons.lang.StringUtils
 import ru.jcorp.dynrules.gui.controls.InputProvider
 import ru.jcorp.dynrules.gui.controls.NumberInputControl
 import ru.jcorp.dynrules.gui.controls.SelectInputControl
 import ru.jcorp.dynrules.production.DomainObject
-import ru.jcorp.dynrules.exceptions.CannotInputVariableException
 
 /**
  * @author artamonov
@@ -33,6 +31,11 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     protected ObjectType _O_ = null
     protected Double _V_ = null
     protected Double _H_ = null
+
+    protected boolean _Wx_ = false
+    protected boolean _Ox_ = false
+    protected boolean _Vx_ = false
+    protected boolean _Hx_ = false
 
     protected String reason
 
@@ -66,31 +69,35 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     }
 
     Double getW() {
-        if (!_W_) {
+        if (!_W_ && !_Wx_) {
             _W_ = inputProvider.showInputControl(new NumberInputControl(), 'variable.input.W')
+            _Wx_ = true
         }
         return _W_
     }
 
     ObjectType getO() {
-        if (!_O_) {
+        if (!_O_ && !_Ox_) {
             Collection<ObjectType> values = ObjectType.values()
             _O_ = inputProvider.showInputControl(
                     new SelectInputControl<ObjectType>(values), 'variable.input.O')
+            _Ox_ = true
         }
         return _O_
     }
 
     Double getV() {
-        if (!_V_) {
+        if (!_V_ && !_Vx_) {
             _V_ = inputProvider.showInputControl(new NumberInputControl(), 'variable.input.V')
+            _Vx_ = true
         }
         return _V_
     }
 
     Double getH() {
-        if (!_H_) {
+        if (!_H_ && !_Hx_) {
             _H_ = inputProvider.showInputControl(new NumberInputControl(), 'variable.input.H')
+            _Hx_ = true
         }
         return _H_
     }
