@@ -83,6 +83,18 @@ class DynamicRulesApp {
         return resourceBundle.getString(key)
     }
 
+    String getResourceText(String resource) {
+        InputStream sourceStream = getClass().getResourceAsStream(resource);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(sourceStream, 'UTF-8'));
+        StringBuilder builder = new StringBuilder();
+
+        String line;
+        while ((line = reader.readLine()) != null)
+            builder.append(line).append("\n");
+
+        return builder.toString()
+    }
+
     ImageIcon getResourceIcon(String name) {
         return new ImageIcon(DynamicRulesApp.class.getResource('/icons/' + name))
     }

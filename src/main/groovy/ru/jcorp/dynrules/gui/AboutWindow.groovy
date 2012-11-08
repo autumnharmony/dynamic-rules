@@ -47,7 +47,7 @@ class AboutWindow extends JDialog {
                 label(text: app.getMessage('authors'), border: new EmptyBorder(3, 5, 3, 5))
                 label(text: app.getMessage('teacher'), border: new EmptyBorder(3, 5, 3, 5))
             }
-            textArea(constraints: CENTER, text: readTask(), editable: false, lineWrap: true, wrapStyleWord: true)
+            textArea(constraints: CENTER, text: app.getResourceText('/TASK'), editable: false, lineWrap: true, wrapStyleWord: true)
             hbox(constraints: PAGE_END, border: new EmptyBorder(3, 5, 3, 5)) {
                 hglue()
                 button(text: app.getMessage('edit.ok'), actionPerformed: { this.dispose() })
@@ -55,14 +55,5 @@ class AboutWindow extends JDialog {
             }
         }
         add(panel)
-    }
-
-    def readTask() {
-        InputStream problemStream = getClass().getResourceAsStream('/TASK')
-        String taskText = problemStream.withReader {
-            reader ->
-            return reader.readLines().join('\n')
-        }
-        return taskText
     }
 }

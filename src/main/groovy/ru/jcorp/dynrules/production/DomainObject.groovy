@@ -17,6 +17,8 @@
 
 package ru.jcorp.dynrules.production
 
+import ru.jcorp.dynrules.model.Rule
+
 /**
  * @author artamonov
  */
@@ -27,4 +29,8 @@ interface DomainObject {
     void setReason(String reason)
 
     String getReason()
+
+    void addActivatedRule(Rule rule)
+
+    Set<Rule> getActivatedRules()
 }

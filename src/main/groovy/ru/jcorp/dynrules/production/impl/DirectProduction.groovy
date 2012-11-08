@@ -67,6 +67,8 @@ class DirectProduction implements ProductionMethod {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, domainObject)
                     thenClosure.call()
 
+                    domainObject.addActivatedRule(rule)
+
                     if (domainObject.resolved) {
                         domainObject.reason = rule.reason
                         break

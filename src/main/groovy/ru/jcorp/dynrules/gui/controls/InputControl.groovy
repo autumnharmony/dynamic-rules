@@ -31,5 +31,5 @@ public interface InputControl<T> {
 
     Action getNextAction()
 
-    void clear();
+    void clear()
 }

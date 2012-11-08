@@ -42,7 +42,7 @@ class InvertedProduction implements ProductionMethod {
 
     @Override
     void perform(RuleSet ruleSet) {
-        Set<Rule> badRules = new HashSet<Rule>();
+        Set<Rule> badRules = new HashSet<Rule>()
         Rule previousRule = null
 
         while (!variablesStack.isEmpty()) {
@@ -97,13 +97,16 @@ class InvertedProduction implements ProductionMethod {
                 if (!newTargetVariable && ruleFound && rule != null) {
                     Closure thenClosure = linkClosureToDelegate(rule.thenStatement, domainObject)
                     thenClosure.call()
+
+                    domainObject.addActivatedRule(rule)
+
                     if (domainObject.resolved)
                         domainObject.reason = rule.reason
                 }
             }
 
             if (!newTargetVariable && !ruleFound) {
-                variablesStack.pop();
+                variablesStack.pop()
             }
         }
         if (!domainObject.resolved)

@@ -19,6 +19,7 @@ package ru.jcorp.dynrules.domain
 
 import ru.jcorp.dynrules.production.DomainObject
 import ru.jcorp.dynrules.exceptions.CannotInputVariableException
+import ru.jcorp.dynrules.model.Rule
 
 /**
  * @author artamonov
@@ -130,5 +131,15 @@ class TestDomainObject extends GroovyObjectSupport implements DomainObject {
     @Override
     String getReason() {
         return null
+    }
+
+    @Override
+    void addActivatedRule(Rule rule) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    Set<Rule> getActivatedRules() {
+        return null  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

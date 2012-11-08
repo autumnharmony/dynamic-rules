@@ -15,14 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.jcorp.dynrules.sys;
+package ru.jcorp.dynrules.sys
 
-import org.apache.commons.lang.StringUtils;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Enumeration;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import org.apache.commons.lang.StringUtils
 
 /**
  * @author artamonov
@@ -32,9 +27,9 @@ public class Utf8ResourceBundle {
     private Utf8ResourceBundle() {
     }
 
-    public static ResourceBundle getBundle(String baseName) {
-        ResourceBundle bundle = ResourceBundle.getBundle(baseName);
-        return createUtf8PropertyResourceBundle(bundle);
+    static ResourceBundle getBundle(String baseName) {
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName)
+        return createUtf8PropertyResourceBundle(bundle)
     }
 
     private static ResourceBundle createUtf8PropertyResourceBundle(ResourceBundle bundle) {
@@ -44,27 +39,26 @@ public class Utf8ResourceBundle {
     }
 
     private static class Utf8PropertyResourceBundle extends ResourceBundle {
-        PropertyResourceBundle bundle;
+        PropertyResourceBundle bundle
 
         private Utf8PropertyResourceBundle(PropertyResourceBundle bundle) {
-            this.bundle = bundle;
+            this.bundle = bundle
         }
 
         @Override
-        public Enumeration<String> getKeys() {
-            return bundle.getKeys();
+        Enumeration<String> getKeys() {
+            return bundle.getKeys()
         }
 
         @Override
-        protected Object handleGetObject(String key) {
+        protected def handleGetObject(String key) {
             String value = (String) bundle.handleGetObject(key);
             try {
                 if (StringUtils.isNotEmpty(value))
-                    return new String(value.getBytes("ISO-8859-1"), "UTF-8");
+                    return new String(value.getBytes('ISO-8859-1'), 'UTF-8');
                 else
-                    return "";
-            } catch (UnsupportedEncodingException e) {
-                // Shouldn't fail - but should we still add logging message?
+                    return '';
+            } catch (UnsupportedEncodingException ignored) {
                 return null;
             }
         }

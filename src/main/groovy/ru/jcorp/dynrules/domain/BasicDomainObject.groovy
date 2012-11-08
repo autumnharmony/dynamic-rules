@@ -21,6 +21,7 @@ import ru.jcorp.dynrules.gui.controls.InputProvider
 import ru.jcorp.dynrules.gui.controls.NumberInputControl
 import ru.jcorp.dynrules.gui.controls.SelectInputControl
 import ru.jcorp.dynrules.production.DomainObject
+import ru.jcorp.dynrules.model.Rule
 
 /**
  * @author artamonov
@@ -38,6 +39,7 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     protected boolean _Hx_ = false
 
     protected String reason
+    protected Set<Rule> activatedRules = new HashSet<Rule>()
 
     static final CraneType MK = CraneType.MK
     static final CraneType NKPK = CraneType.NKPK
@@ -110,5 +112,15 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     @Override
     String getReason() {
         return reason
+    }
+
+    @Override
+    void addActivatedRule(Rule rule) {
+        activatedRules.add(rule)
+    }
+
+    @Override
+    Set<Rule> getActivatedRules() {
+        return activatedRules
     }
 }

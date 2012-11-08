@@ -24,5 +24,5 @@ import ru.jcorp.dynrules.model.RuleSet
  */
 public interface ProductionMethod {
 
-    void perform(RuleSet ruleSet);
+    void perform(RuleSet ruleSet)
 }

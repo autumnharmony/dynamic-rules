@@ -76,6 +76,11 @@ class Rule {
         return getVariables(this.thenStatement)
     }
 
+    @Override
+    String toString() {
+        return name
+    }
+
     protected static class DelegateStub extends GroovyObjectSupport {
 
         private Set<String> variables = new LinkedHashSet<String>()

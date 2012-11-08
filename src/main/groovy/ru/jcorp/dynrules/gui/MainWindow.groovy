@@ -33,6 +33,7 @@ import ru.jcorp.dynrules.domain.impl.InvertedDomainObject
 import ru.jcorp.dynrules.production.impl.InvertedProduction
 import java.awt.event.ActionEvent
 import javax.swing.filechooser.FileNameExtensionFilter
+import org.apache.commons.lang.StringUtils
 
 /**
  * @author artamonov
@@ -145,7 +146,7 @@ class MainWindow extends JFrame {
                 app.getMessage('edit.selectProduction'),
                 app.getMessage('edit.options'), JOptionPane.DEFAULT_OPTION,
                 JOptionPane.INFORMATION_MESSAGE, null,
-                options.toArray(), '');
+                options.toArray(), '')
 
         ProductionMethod method
         DomainObject domainObject
@@ -160,10 +161,17 @@ class MainWindow extends JFrame {
         }
 
         reasonBtn.setAction(new AbstractAction(reasonBtn.text) {
-
             @Override
             void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(MainWindow.this, domainObject.reason, app.getMessage('edit.reason'), JOptionPane.INFORMATION_MESSAGE)
+                String message = domainObject.reason
+                String rules = StringUtils.join(domainObject.activatedRules.iterator(), ',')
+
+                if (StringUtils.isNotEmpty(rules)) {
+                    message += '\n' + app.getMessage('edit.rules') + ' ' + rules
+                }
+
+                JOptionPane.showMessageDialog(MainWindow.this, message,
+                        app.getMessage('edit.reason'), JOptionPane.INFORMATION_MESSAGE)
             }
         })
 

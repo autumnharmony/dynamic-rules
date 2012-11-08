@@ -40,10 +40,16 @@ class DslSupport {
 
     static Closure loadClosureFromStream(InputStream closureStream) {
         GroovyShell sh = new GroovyShell()
-        String script = closureStream.withReader {
-            reader ->
-            return '{it->\n' + reader.readLines().join('\n') + '\n}'
-        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(closureStream, 'UTF-8'))
+        StringBuilder builder = new StringBuilder()
+
+        builder.append('{it->')
+        String line
+        while ((line = reader.readLine()) != null)
+            builder.append(line).append("\n")
+        builder.append('\n}')
+
+        String script = builder.toString()
         return sh.evaluate(script) as Closure
     }
 }
