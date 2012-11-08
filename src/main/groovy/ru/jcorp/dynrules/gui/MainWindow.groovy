@@ -167,7 +167,7 @@ class MainWindow extends JFrame {
                 String rules = StringUtils.join(domainObject.activatedRules.iterator(), ',')
 
                 if (StringUtils.isNotEmpty(rules)) {
-                    message += '\n' + app.getMessage('edit.rules') + ' ' + rules
+                    message += '\n\n' + app.getMessage('edit.rules') + ' ' + rules
                 }
 
                 JOptionPane.showMessageDialog(MainWindow.this, message,

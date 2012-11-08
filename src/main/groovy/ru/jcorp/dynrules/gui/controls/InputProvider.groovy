@@ -94,6 +94,7 @@ class InputProvider {
 
                 inputControl.component.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30))
                 inputControl.component.setPreferredSize(new Dimension(-1, 30))
+                inputControl.component.requestFocus()
             }
         })
         dialogPane.getRootPane()?.repaint()

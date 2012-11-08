@@ -22,6 +22,7 @@ import ru.jcorp.dynrules.gui.controls.NumberInputControl
 import ru.jcorp.dynrules.gui.controls.SelectInputControl
 import ru.jcorp.dynrules.production.DomainObject
 import ru.jcorp.dynrules.model.Rule
+import ru.jcorp.dynrules.DynamicRulesApp
 
 /**
  * @author artamonov
@@ -111,7 +112,32 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
 
     @Override
     String getReason() {
-        return reason
+        def reasonText = new StringBuilder()
+        def app = DynamicRulesApp.instance
+        reasonText.append(app.getMessage('edit.input'))
+        if (_Ox_) {
+            String oValue = _O_ == null ? app.getMessage('variable.undefined.O') : String.valueOf(_O_)
+            reasonText.append('\n').append(app.getMessage('variable.input.O') + ' ' + oValue)
+        }
+
+        if (_Vx_) {
+            String vValue = _V_ == null ? app.getMessage('variable.undefined.V') : String.valueOf(_V_)
+            reasonText.append('\n').append(app.getMessage('variable.input.V') + ' ' + vValue)
+        }
+
+        if (_Wx_) {
+            String wValue = _W_ == null ? app.getMessage('variable.undefined.W') : String.valueOf(_W_)
+            reasonText.append('\n').append(app.getMessage('variable.input.W') + ' ' + wValue)
+        }
+
+        if (_Hx_) {
+            String hValue = _H_ == null ? app.getMessage('variable.undefined.H') : String.valueOf(_H_)
+            reasonText.append('\n').append(app.getMessage('variable.input.H') + ' ' + hValue)
+        }
+
+        reasonText.append('\n').append('\n').append(app.getMessage('edit.reason')).append('\n').append(reason)
+
+        return reasonText.toString()
     }
 
     @Override

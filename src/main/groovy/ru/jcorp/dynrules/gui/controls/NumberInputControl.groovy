@@ -25,6 +25,10 @@ import javax.swing.JTextField
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import ru.jcorp.dynrules.exceptions.ValidationException
+import java.awt.event.KeyListener
+import java.awt.event.KeyEvent
+import javax.swing.JOptionPane
+import java.awt.event.KeyAdapter
 
 /**
  * @author artamonov
@@ -46,7 +50,7 @@ class NumberInputControl implements InputControl<Double> {
             @Override
             void actionPerformed(ActionEvent e) {
                 try {
-                    value = Double.parseDouble(component.text)
+                    apply()
                 } catch (NumberFormatException ignored) {
                     throw new ValidationException()
                 }
@@ -55,6 +59,37 @@ class NumberInputControl implements InputControl<Double> {
 
         component = app.guiBuilder.textField(text: '0',
                 size: [150, -1], minimumSize: [150, -1], preferredSize: [150, -1])
+        component.addKeyListener(new KeyAdapter() {
+            @Override
+            void keyPressed(KeyEvent e) {
+                if (e.keyCode == KeyEvent.VK_ENTER) {
+                    try {
+                        apply()
+                    } catch (ValidationException ignored) {
+                        def app = DynamicRulesApp.instance
+                        JOptionPane.showMessageDialog(component,
+                                app.getMessage('edit.validation'),
+                                app.getMessage('edit.warning'),
+                                JOptionPane.WARNING_MESSAGE)
+                        return
+                    }
+
+                    component.enabled = false
+
+                    synchronized (NumberInputControl.this) {
+                        NumberInputControl.this.notifyAll()
+                    }
+                }
+            }
+        })
+    }
+
+    def apply() {
+        try {
+            value = Double.parseDouble(component.text)
+        } catch (NumberFormatException ignored) {
+            throw new ValidationException()
+        }
     }
 
     @Override

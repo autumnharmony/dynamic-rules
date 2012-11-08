@@ -26,6 +26,10 @@ import javax.swing.Action
 import javax.swing.AbstractAction
 import java.awt.event.ActionEvent
 import javax.swing.JComboBox
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
+import ru.jcorp.dynrules.exceptions.ValidationException
+import javax.swing.JOptionPane
 
 /**
  * @author artamonov
@@ -58,6 +62,29 @@ class SelectInputControl<T extends Enum> implements InputControl<T> {
 
         this.component = app.guiBuilder.comboBox(id: 'resultBox', model: itemsModel,
                 size: [150, -1], minimumSize: [150, -1], preferredSize: [150, -1])
+        this.component.addKeyListener(new KeyAdapter() {
+            @Override
+            void keyPressed(KeyEvent e) {
+                if (e.keyCode == KeyEvent.VK_ENTER) {
+                    try {
+                        value = component.getSelectedItem()
+                    } catch (ValidationException ignored) {
+                        def app = DynamicRulesApp.instance
+                        JOptionPane.showMessageDialog(component,
+                                app.getMessage('edit.validation'),
+                                app.getMessage('edit.warning'),
+                                JOptionPane.WARNING_MESSAGE)
+                        return
+                    }
+
+                    component.enabled = false
+
+                    synchronized (SelectInputControl.this) {
+                        SelectInputControl.this.notifyAll()
+                    }
+                }
+            }
+        })
     }
 
     @Override

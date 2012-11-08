@@ -33,9 +33,9 @@ public class Utf8ResourceBundle {
     }
 
     private static ResourceBundle createUtf8PropertyResourceBundle(ResourceBundle bundle) {
-        if (!(bundle instanceof PropertyResourceBundle)) return bundle;
+        if (!(bundle instanceof PropertyResourceBundle)) return bundle
 
-        return new Utf8PropertyResourceBundle((PropertyResourceBundle) bundle);
+        return new Utf8PropertyResourceBundle((PropertyResourceBundle) bundle)
     }
 
     private static class Utf8PropertyResourceBundle extends ResourceBundle {
@@ -52,12 +52,12 @@ public class Utf8ResourceBundle {
 
         @Override
         protected def handleGetObject(String key) {
-            String value = (String) bundle.handleGetObject(key);
+            String value = (String) bundle.handleGetObject(key)
             try {
                 if (StringUtils.isNotEmpty(value))
-                    return new String(value.getBytes('ISO-8859-1'), 'UTF-8');
+                    return new String(value.getBytes('ISO-8859-1'), 'UTF-8')
                 else
-                    return '';
+                    return ''
             } catch (UnsupportedEncodingException ignored) {
                 return null;
             }
