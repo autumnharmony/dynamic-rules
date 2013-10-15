@@ -39,7 +39,7 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
     protected boolean _Vx_ = false
     protected boolean _Hx_ = false
 
-    protected String reason
+    protected String reason = ""
     protected Set<Rule> activatedRules = new HashSet<Rule>()
 
     static final CraneType MK = CraneType.MK
@@ -52,11 +52,12 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
 
     static final ObjectType WORKSHOP = ObjectType.WORKSHOP
     static final ObjectType WAREHOUSE = ObjectType.WAREHOUSE
+    static final ObjectType CLOSEDWAREHOUSE = ObjectType.CLOSEDWAREHOUSE
     static final ObjectType POWERSTATION = ObjectType.POWERSTATION
     static final ObjectType RIVERPORT = ObjectType.RIVERPORT
     static final ObjectType CONSTRUCTION = ObjectType.CONSTRUCTION
 
-    protected List<CraneType> _RESULT_ = null
+    protected List<CraneType> _RESULT_ = new ArrayList<CraneType>();
 
     protected Map<String, Object> miscVariables = new HashMap<String, Object>()
 
@@ -68,7 +69,7 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
 
     @Override
     boolean isResolved() {
-        return _RESULT_ != null
+        return _RESULT_ != null && _RESULT_.size() > 0
     }
 
     Double getW() {
@@ -107,7 +108,7 @@ abstract class BasicDomainObject extends GroovyObjectSupport implements DomainOb
 
     @Override
     void setReason(String reason) {
-        this.reason = reason
+        this.reason += ".\n" + reason
     }
 
     @Override

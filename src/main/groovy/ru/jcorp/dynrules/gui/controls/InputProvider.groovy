@@ -104,6 +104,7 @@ class InputProvider {
         return inputControl.value
     }
 
+    private JList resultList;
     void printResult(result) {
         EventQueue.invokeAndWait(new Runnable() {
             @Override
@@ -111,7 +112,10 @@ class InputProvider {
                 nextButton.visible = false
                 unknownBtn.visible = false
                 if (result != null) {
-                    JList resultList = new JList((result as Collection).toArray())
+                    if(resultList != null) {
+                        resultContainer.remove(resultList)
+                    }
+                    resultList = new JList((result as Collection).toArray())
                     resultList.setBorder(new LineBorder(Color.BLACK))
                     resultContainer.add(resultList)
                     reasonBtn.visible = true

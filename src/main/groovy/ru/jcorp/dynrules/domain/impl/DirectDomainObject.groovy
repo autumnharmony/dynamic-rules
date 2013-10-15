@@ -33,8 +33,12 @@ class DirectDomainObject extends BasicDomainObject {
     }
 
     def setResult(List<CraneType> result) {
-        this._RESULT_ = result
-        this.inputProvider.printResult(result)
+        for(CraneType t : result) {
+            if(_RESULT_.indexOf(t) == -1) {
+                _RESULT_.add(t)
+            }
+        }
+        this.inputProvider.printResult(_RESULT_)
     }
 
     @Override

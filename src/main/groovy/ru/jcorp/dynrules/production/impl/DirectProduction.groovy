@@ -37,11 +37,10 @@ class DirectProduction implements ProductionMethod {
     @Override
     void perform(RuleSet ruleSet) {
         int runCount = 0
-
-        while (!domainObject.resolved &&
-                runCount != ruleSet.size) {
-
-            for (Rule rule : ruleSet.rules) {
+        def rules = new ArrayList<Rule>(ruleSet.rules)
+        while (runCount != ruleSet.size) {
+            def activatedRules = new ArrayList<Rule>()
+            for (Rule rule : rules) {
                 boolean conjValue = true
                 boolean allValuesResolved = true
 
@@ -68,6 +67,7 @@ class DirectProduction implements ProductionMethod {
                     thenClosure.call()
 
                     domainObject.addActivatedRule(rule)
+                    activatedRules.add(rule)
 
                     if (domainObject.resolved) {
                         domainObject.reason = rule.reason
@@ -75,6 +75,9 @@ class DirectProduction implements ProductionMethod {
                     }
                 }
             }
+            for(Rule rule : activatedRules)
+                rules.remove(rule)
+
             runCount++
         }
 
